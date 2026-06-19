@@ -1,0 +1,158 @@
+QUALITY CONTROL MANUAL
+======================
+
+1. QUALITY MANAGEMENT SYSTEM OVERVIEW
+
+1.1 Purpose
+This manual defines the quality control standards, inspection procedures, and
+compliance requirements for all products and suppliers in the supply chain.
+The quality management system is aligned with ISO-9001:2015 standards.
+
+1.2 Scope
+Quality control applies to all incoming materials, in-process production,
+finished goods, and supplier-provided components across all product categories:
+mechanical parts, electronic components, raw materials, packaging, and chemicals.
+
+1.3 Quality Policy
+We are committed to delivering products that meet or exceed customer expectations
+through continuous improvement, defect prevention, and compliance with all
+applicable regulatory standards.
+
+2. INSPECTION PROCEDURES
+
+2.1 Incoming Material Inspection
+All incoming shipments undergo inspection within 24 hours of receipt:
+- Visual inspection for damage and packaging integrity
+- Quantity verification against purchase order
+- Dimensional checks using calibrated instruments
+- Material composition verification (for critical components)
+- Documentation review (certificates of conformance, test reports)
+
+2.2 Sampling Plans
+- Standard lots (< 1000 units): AQL 1.0, General Inspection Level II
+- Large lots (1000-10000 units): AQL 0.65, General Inspection Level II
+- Critical components: 100% inspection regardless of lot size
+- Reduced inspection: Available for Tier 1 suppliers with 10+ consecutive passed lots
+
+2.3 Inspection Results Classification
+- Pass: All measured parameters within specification limits
+- Conditional Pass: Minor deviations that do not affect functionality (requires deviation approval)
+- Fail: One or more critical parameters outside specification limits
+- Hold: Pending additional testing or supplier clarification
+
+2.4 Batch Identification
+Each inspection is tracked by batch ID in the format BATCH-YYYY-NNN where YYYY
+is the year and NNN is a sequential number. Batch IDs are linked to product IDs
+for full traceability.
+
+3. PRODUCT QUALITY STANDARDS
+
+3.1 Mechanical Parts
+- Dimensional accuracy: +/- 0.01mm for precision components
+- Surface roughness: Ra <= 0.8 micrometers
+- Hardness: Per material specification (HRC/HRB scale)
+- Tensile strength: Per material specification
+- Fatigue life: Minimum 10^6 cycles at rated load
+
+3.2 Electronic Components
+- Electrical parameters: Within datasheet specifications
+- Solder joint quality: IPC-A-610 Class 2 minimum
+- ESD sensitivity: Proper handling and packaging verified
+- Operating temperature range: Per component specification
+- Moisture sensitivity level: Proper dry-pack verified
+
+3.3 Raw Materials
+- Chemical composition: Within specified tolerances
+- Physical properties: Density, viscosity, melting point as specified
+- Purity level: Minimum 99.5% for industrial grade
+- Shelf life: Minimum 80% remaining at time of receipt
+- Storage conditions: Temperature and humidity per material SDS
+
+3.4 Packaging Materials
+- Structural integrity: Drop test from 1.2m height
+- Moisture resistance: 24-hour humidity exposure test
+- Print quality: Color accuracy within Delta E <= 3.0
+- Dimensional accuracy: +/- 1mm
+- Recyclability: Minimum 80% recyclable content
+
+4. COMPLIANCE FRAMEWORK
+
+4.1 Regulatory Compliance
+All products and suppliers must comply with:
+- ISO-9001:2015 Quality Management Systems
+- ISO-14001:2015 Environmental Management Systems (where applicable)
+- RoHS Directive (Restriction of Hazardous Substances)
+- REACH Regulation (Registration, Evaluation, Authorization of Chemicals)
+- Country-specific import/export regulations
+
+4.2 Supplier Compliance Requirements
+- Annual self-assessment questionnaire
+- Biennial on-site audit for Tier 1 and Tier 2 suppliers
+- Immediate notification of any regulatory changes affecting products
+- Maintenance of quality records for minimum 7 years
+- Participation in corrective action processes when required
+
+4.3 Compliance Status Categories
+- Compliant: All requirements met, certifications current
+- Conditionally Compliant: Minor gaps identified, remediation plan in place
+- Non-Compliant: Critical gaps requiring immediate corrective action
+- Suspended: Compliance status revoked pending investigation
+
+4.4 Audit Schedule
+- Internal audits: Quarterly
+- Supplier audits: Per tier schedule (see Supplier Manual Section 5.2)
+- Certification audits: Annual (ISO-9001, ISO-14001)
+- Regulatory audits: As required by governing bodies
+
+5. NON-CONFORMANCE MANAGEMENT
+
+5.1 Non-Conformance Report (NCR) Process
+Step 1: Inspector identifies non-conformance and creates NCR
+Step 2: Quality engineer classifies severity (Critical/Major/Minor)
+Step 3: Affected material is quarantined and labeled
+Step 4: Root cause analysis conducted within 5 business days
+Step 5: Corrective action implemented and verified
+Step 6: NCR closed with documentation of resolution
+
+5.2 Severity Classification
+- Critical: Safety risk or complete loss of function. Requires immediate containment
+  and customer notification within 24 hours.
+- Major: Significant performance degradation or appearance defect. Requires
+  corrective action within 10 business days.
+- Minor: Cosmetic or documentation issue with no functional impact. Requires
+  corrective action within 30 business days.
+
+5.3 Disposition Options
+- Return to Supplier: For supplier-caused defects
+- Rework: If cost-effective and quality can be assured
+- Use As-Is: With engineering deviation approval (minor issues only)
+- Scrap: When rework is not feasible or cost-effective
+
+6. CONTINUOUS IMPROVEMENT
+
+6.1 Quality Metrics Dashboard
+Key metrics tracked monthly:
+- First Pass Yield (target: >= 98%)
+- Cost of Quality (target: <= 2% of revenue)
+- Customer complaint rate (target: <= 0.1%)
+- Supplier defect rate (target: <= 500 DPMO)
+- Corrective action closure rate (target: >= 90% on time)
+
+6.2 Improvement Initiatives
+- Kaizen events: Monthly focused improvement workshops
+- Six Sigma projects: For systemic quality issues
+- Supplier development programs: For underperforming suppliers
+- Training programs: Quarterly quality awareness sessions
+
+7. DOCUMENT CONTROL
+
+7.1 Document Hierarchy
+- Level 1: Quality Policy (approved by executive management)
+- Level 2: Quality Manual (this document, approved by Quality Director)
+- Level 3: Procedures and Work Instructions (approved by department managers)
+- Level 4: Forms, checklists, and records (controlled by Quality team)
+
+7.2 Revision Control
+All quality documents follow a formal revision control process. Changes require
+review and approval by the document owner and Quality Director. Superseded
+versions are archived for a minimum of 7 years.

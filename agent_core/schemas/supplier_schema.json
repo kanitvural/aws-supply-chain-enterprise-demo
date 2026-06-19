@@ -1,0 +1,30 @@
+[
+  {
+    "name": "get_supplier",
+    "description": "Retrieve supplier details including name, contact information, rating, and status.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "supplier_id": {
+          "type": "string",
+          "description": "The unique identifier of the supplier to retrieve."
+        }
+      },
+      "required": ["supplier_id"]
+    }
+  },
+  {
+    "name": "get_supplier_kb",
+    "description": "Search supplier knowledge base documents for relevant information using semantic retrieval.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string",
+          "description": "The search query to find relevant supplier documents and policies."
+        }
+      },
+      "required": ["query"]
+    }
+  }
+]

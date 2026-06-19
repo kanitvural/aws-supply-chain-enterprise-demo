@@ -1,0 +1,43 @@
+[
+  {
+    "name": "calculate_shipping",
+    "description": "Calculate estimated shipping cost for a destination and weight using available routes.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "destination": {
+          "type": "string",
+          "description": "The shipping destination location."
+        },
+        "weight_kg": {
+          "type": "number",
+          "description": "The shipment weight in kilograms."
+        }
+      },
+      "required": ["destination", "weight_kg"]
+    }
+  },
+  {
+    "name": "list_shipments",
+    "description": "List all current shipments with their tracking numbers, status, origin, destination, and details. No parameters required.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "track_shipment",
+    "description": "Track the current status and location of a shipment by its tracking number.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "tracking_number": {
+          "type": "string",
+          "description": "The unique tracking number of the shipment."
+        }
+      },
+      "required": ["tracking_number"]
+    }
+  }
+]

@@ -1,0 +1,47 @@
+[
+  {
+    "name": "list_products",
+    "description": "List all products in the inventory. Returns product IDs, names, quantities, and other details for every product.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "check_inventory",
+    "description": "Check inventory details for a specific product including quantity, location, and status.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "product_id": {
+          "type": "string",
+          "description": "The unique identifier of the product to check inventory for."
+        }
+      },
+      "required": ["product_id"]
+    }
+  },
+  {
+    "name": "update_inventory",
+    "description": "Update the inventory quantity for a specific product using set, add, or subtract operations.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "product_id": {
+          "type": "string",
+          "description": "The unique identifier of the product to update."
+        },
+        "quantity": {
+          "type": "integer",
+          "description": "The quantity value to set, add, or subtract."
+        },
+        "operation": {
+          "type": "string",
+          "description": "The inventory operation to perform: set, add, or subtract. Defaults to set if not specified."
+        }
+      },
+      "required": ["product_id", "quantity"]
+    }
+  }
+]

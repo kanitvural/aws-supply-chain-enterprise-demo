@@ -1,0 +1,162 @@
+INVENTORY MANAGEMENT PROCEDURES
+================================
+
+1. INVENTORY CONTROL OVERVIEW
+
+1.1 Purpose
+This document defines the procedures for managing inventory across all warehouse
+locations, including receiving, storage, cycle counting, replenishment, and
+disposition of supply chain products.
+
+1.2 Scope
+These procedures apply to all product categories maintained in the inventory
+system: mechanical parts, electronic components, raw materials, packaging
+materials, and chemicals.
+
+1.3 Inventory System
+All inventory transactions are recorded in the centralized inventory management
+system. Each product is identified by a unique product ID in the format
+PROD-NNN (e.g., PROD-001). Real-time inventory levels are available to all
+authorized agents and systems.
+
+2. WAREHOUSE ORGANIZATION
+
+2.1 Location Coding
+Warehouse locations follow the format WH-X-NN where:
+- WH: Warehouse prefix
+- X: Zone letter (A=Receiving, B=Bulk Storage, C=Pick/Pack, D=Shipping, E=Quarantine)
+- NN: Rack/bin number (01-99)
+
+Example: WH-A-12 indicates Receiving Zone, Rack 12.
+
+2.2 Storage Requirements by Category
+- Mechanical parts: Standard shelving, ambient temperature, low humidity (< 60%)
+- Electronic components: ESD-safe storage, temperature controlled (18-25C), humidity < 40%
+- Raw materials: Per material SDS requirements, segregated by compatibility
+- Packaging: Dry storage, protected from direct sunlight
+- Chemicals: Ventilated storage, secondary containment, per SDS requirements
+
+2.3 Zone Descriptions
+- Zone A (Receiving): Incoming shipments staged for inspection
+- Zone B (Bulk Storage): Long-term storage for high-volume items
+- Zone C (Pick/Pack): Active inventory for order fulfillment
+- Zone D (Shipping): Outbound orders staged for carrier pickup
+- Zone E (Quarantine): Non-conforming or suspect materials pending disposition
+
+3. RECEIVING PROCEDURES
+
+3.1 Shipment Receipt
+Step 1: Verify carrier documentation against purchase order
+Step 2: Inspect packaging for visible damage (photograph if damaged)
+Step 3: Count units and verify against packing slip
+Step 4: Scan or enter receipt into inventory system
+Step 5: Move to Zone A for quality inspection
+Step 6: After inspection pass, move to designated storage location
+
+3.2 Discrepancy Handling
+- Quantity shortage: Notify procurement within 4 hours, file carrier claim if applicable
+- Quantity overage: Notify procurement, hold excess in Zone A pending disposition
+- Damage: Photograph, quarantine in Zone E, notify supplier and carrier
+- Wrong item: Quarantine in Zone E, notify procurement for return authorization
+
+4. INVENTORY LEVELS AND REPLENISHMENT
+
+4.1 Reorder Point Calculation
+Reorder Point = (Average Daily Usage x Lead Time in Days) + Safety Stock
+Safety Stock = Z-score x Standard Deviation of Daily Usage x Square Root of Lead Time
+
+4.2 Standard Reorder Points by Category
+- Mechanical parts: 2-week supply as safety stock
+- Electronic components: 3-week supply (longer lead times)
+- Raw materials: 1-week supply (readily available)
+- Packaging: 2-week supply
+- Chemicals: 4-week supply (regulatory lead times)
+
+4.3 Replenishment Triggers
+When inventory quantity falls below the reorder point:
+Step 1: System generates replenishment alert
+Step 2: Procurement reviews and creates purchase order
+Step 3: Order placed with preferred supplier (highest tier available)
+Step 4: Expected delivery date tracked in system
+Step 5: Receiving processes inbound shipment per Section 3
+
+4.4 Critical Stock Alerts
+- Yellow alert: Quantity at or below reorder point
+- Orange alert: Quantity at 50% of reorder point
+- Red alert: Quantity at or below safety stock level
+- Stockout: Zero available quantity, escalate to procurement manager
+
+5. INVENTORY OPERATIONS
+
+5.1 Stock Adjustments
+All inventory adjustments must be documented with:
+- Product ID and current quantity
+- Adjustment type: set (absolute), add (increment), or subtract (decrement)
+- Reason code: receipt, shipment, damage, cycle count, return, scrap
+- Authorizing personnel (adjustments > 100 units require supervisor approval)
+
+5.2 Supported Operations
+- check_inventory: Query current stock level, location, and status for a product
+- update_inventory: Modify quantity using set, add, or subtract operations
+  - set: Replace current quantity with specified value
+  - add: Increase current quantity by specified amount
+  - subtract: Decrease current quantity by specified amount (cannot go below zero)
+
+5.3 Inventory Valuation
+- Method: Weighted Average Cost
+- Revaluation: Monthly, aligned with financial close
+- Write-down policy: Items with no movement for 12+ months reviewed for write-down
+- Obsolescence: Items with no movement for 24+ months flagged for disposition
+
+6. CYCLE COUNTING
+
+6.1 Count Schedule
+- A-items (top 20% by value): Monthly count
+- B-items (next 30% by value): Quarterly count
+- C-items (remaining 50% by value): Semi-annual count
+- All items: Annual full physical inventory (fiscal year end)
+
+6.2 Count Procedures
+Step 1: Generate count sheet from inventory system
+Step 2: Two-person count team independently counts items
+Step 3: Compare counts; if discrepancy > 2%, perform third count
+Step 4: Enter final count into system
+Step 5: Investigate and document any variances > 1%
+Step 6: Adjust inventory with supervisor approval
+
+6.3 Accuracy Targets
+- Overall inventory accuracy: >= 99%
+- A-items accuracy: >= 99.5%
+- B-items accuracy: >= 98%
+- C-items accuracy: >= 95%
+- Location accuracy: >= 99%
+
+7. PRODUCT CATEGORIES
+
+7.1 Category Definitions
+The inventory system organizes products into the following categories:
+- mechanical_parts: Bearings, gears, shafts, fasteners, seals
+- electronic_components: Circuit boards, sensors, connectors, cables
+- raw_materials: Steel, aluminum, copper, plastics, composites
+- packaging: Boxes, pallets, wrapping, labels, cushioning
+- chemicals: Lubricants, adhesives, solvents, coatings, cleaners
+
+7.2 Category-Specific Handling
+Each category has specific handling requirements documented in the warehouse
+management system. Refer to Section 2.2 for storage requirements and the
+Quality Control Manual for inspection standards per category.
+
+8. REPORTING
+
+8.1 Standard Reports
+- Daily: Stock level summary, receipts, shipments, adjustments
+- Weekly: Slow-moving inventory, reorder alerts, accuracy metrics
+- Monthly: Inventory valuation, turnover rates, carrying costs
+- Quarterly: Obsolescence review, category performance analysis
+
+8.2 Key Performance Indicators
+- Inventory turnover ratio (target: 8-12x annually)
+- Days of supply on hand (target: 30-45 days)
+- Stockout rate (target: < 2%)
+- Inventory accuracy (target: >= 99%)
+- Carrying cost as percentage of inventory value (target: <= 25%)

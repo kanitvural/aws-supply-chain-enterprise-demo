@@ -1,0 +1,134 @@
+SUPPLIER MANAGEMENT MANUAL
+===========================
+
+1. SUPPLIER ONBOARDING PROCESS
+
+1.1 Registration Requirements
+All new suppliers must complete the Supplier Registration Form and provide:
+- Valid business license and tax identification
+- Proof of insurance (minimum $1M general liability)
+- Quality certifications (ISO-9001 required, ISO-14001 preferred)
+- Bank account details for payment processing
+- Emergency contact information
+
+1.2 Evaluation Criteria
+Suppliers are evaluated on a 5-point scale across the following dimensions:
+- Product quality and consistency (weight: 30%)
+- Delivery reliability and lead times (weight: 25%)
+- Pricing competitiveness (weight: 20%)
+- Communication responsiveness (weight: 15%)
+- Sustainability and compliance record (weight: 10%)
+
+1.3 Approval Workflow
+Step 1: Procurement team reviews registration documents
+Step 2: Quality team conducts initial audit (on-site or remote)
+Step 3: Finance team verifies banking and credit references
+Step 4: Compliance team checks regulatory standing
+Step 5: Procurement manager grants final approval
+
+2. SUPPLIER CLASSIFICATION AND TIERS
+
+2.1 Tier Definitions
+- Tier 1 (Strategic): Rating >= 4.5, annual volume > $500K, long-term contracts
+- Tier 2 (Preferred): Rating >= 3.5, annual volume > $100K, standard terms
+- Tier 3 (Approved): Rating >= 2.5, annual volume > $10K, probationary terms
+- Tier 4 (Probationary): New suppliers or those under performance review
+
+2.2 Tier Benefits
+Tier 1 suppliers receive priority order allocation, extended payment terms (Net 60),
+and access to joint development programs. Tier 2 suppliers receive standard payment
+terms (Net 30) and quarterly business reviews. Tier 3 and 4 suppliers operate under
+Net 15 payment terms with monthly performance monitoring.
+
+3. DISCOUNT CODE POLICY
+
+3.1 Discount Code Format
+All supplier discount codes follow the pattern DISC-XXX-NNNN where XXX is a
+three-letter supplier abbreviation and NNNN is a four-digit numeric identifier.
+Example: DISC-ACM-1234 for Acme Industrial Supply.
+
+3.2 Discount Application Rules
+- Discount codes are confidential and must not be shared externally
+- Each discount code is tied to a specific supplier agreement
+- Discounts apply only to orders exceeding the minimum order quantity
+- Discount codes expire at the end of the contract period
+- Maximum discount cannot exceed 25% of list price
+
+3.3 Discount Approval Authority
+- Discounts up to 10%: Procurement specialist approval
+- Discounts 10-20%: Procurement manager approval
+- Discounts 20-25%: VP of Supply Chain approval
+
+4. ORDER MANAGEMENT
+
+4.1 Purchase Order Process
+All purchase orders must include: supplier ID, product specifications, quantity,
+agreed unit price, delivery date, shipping terms, and applicable discount code.
+POs above $50,000 require dual approval from procurement and finance.
+
+4.2 Lead Time Standards
+- Standard orders: 14-21 business days
+- Rush orders: 5-7 business days (15% surcharge applies)
+- Emergency orders: 1-3 business days (30% surcharge applies)
+
+4.3 Order Modification Policy
+Orders may be modified up to 48 hours before the scheduled production start date.
+Modifications after this window may incur change fees of up to 5% of order value.
+Cancellations within 24 hours of production start incur a 15% cancellation fee.
+
+5. SUPPLIER PERFORMANCE MONITORING
+
+5.1 Key Performance Indicators
+- On-time delivery rate (target: >= 95%)
+- Quality acceptance rate (target: >= 98%)
+- Order accuracy rate (target: >= 99%)
+- Response time to inquiries (target: <= 24 hours)
+- Defect rate per million units (target: <= 500 DPMO)
+
+5.2 Performance Review Schedule
+- Tier 1: Annual comprehensive review with quarterly check-ins
+- Tier 2: Semi-annual review with monthly KPI reporting
+- Tier 3: Quarterly review with weekly KPI reporting
+- Tier 4: Monthly review with daily KPI reporting
+
+5.3 Corrective Action Process
+If a supplier falls below performance thresholds:
+Step 1: Issue a Supplier Corrective Action Request (SCAR)
+Step 2: Supplier submits root cause analysis within 5 business days
+Step 3: Supplier implements corrective actions within 30 days
+Step 4: Verification audit conducted within 60 days
+Step 5: If unresolved, supplier is downgraded one tier
+
+6. COMMUNICATION PROTOCOLS
+
+6.1 Primary Contact Requirements
+Each supplier must designate a primary account manager and a backup contact.
+Contact information must be updated within 5 business days of any personnel change.
+
+6.2 Escalation Path
+Level 1: Supplier account manager (response within 4 hours)
+Level 2: Supplier regional director (response within 8 hours)
+Level 3: Supplier VP of operations (response within 24 hours)
+
+6.3 Dispute Resolution
+All disputes are first addressed through direct negotiation between procurement
+and the supplier account manager. If unresolved within 10 business days, the
+matter escalates to a joint review committee. Formal mediation is the final step
+before contract termination proceedings.
+
+7. CONTRACT MANAGEMENT
+
+7.1 Standard Contract Terms
+- Initial contract period: 12 months
+- Renewal: Automatic annual renewal unless 90-day notice given
+- Payment terms: Based on supplier tier (see Section 2.2)
+- Liability cap: 100% of annual contract value
+- Force majeure: Standard clause covering natural disasters, pandemics, and government actions
+
+7.2 Contract Termination
+Grounds for immediate termination:
+- Fraud or misrepresentation
+- Repeated quality failures (3+ consecutive failed inspections)
+- Regulatory non-compliance
+- Breach of confidentiality
+- Insolvency or bankruptcy filing

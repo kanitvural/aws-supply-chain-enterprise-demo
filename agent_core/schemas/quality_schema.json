@@ -1,0 +1,52 @@
+[
+  {
+    "name": "check_quality",
+    "description": "Check quality inspection results for a product or batch including pass/fail status and notes.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "product_id": {
+          "type": "string",
+          "description": "The product identifier to check quality inspections for."
+        },
+        "batch_id": {
+          "type": "string",
+          "description": "The batch identifier to check quality inspections for."
+        }
+      },
+      "required": []
+    }
+  },
+  {
+    "name": "get_compliance",
+    "description": "Retrieve compliance status, certifications, and audit information for a product or supplier.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "entity_id": {
+          "type": "string",
+          "description": "The unique identifier of the entity to check compliance for."
+        },
+        "entity_type": {
+          "type": "string",
+          "description": "The type of entity: product or supplier."
+        }
+      },
+      "required": ["entity_id", "entity_type"]
+    }
+  },
+  {
+    "name": "get_standards",
+    "description": "Retrieve quality standards and requirements for a product category.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "product_category": {
+          "type": "string",
+          "description": "The product category to retrieve quality standards for."
+        }
+      },
+      "required": []
+    }
+  }
+]
