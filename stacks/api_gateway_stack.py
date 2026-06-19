@@ -35,11 +35,20 @@ class ApiGatewayStack(Stack):
             self,
             "SupplyChainApi",
             rest_api_name="SupplyChainChatApi",
+            endpoint_configuration=apigw.EndpointConfiguration(types=[apigw.EndpointType.REGIONAL]),
             description="API Gateway for Supply Chain Assistant",
             default_cors_preflight_options=apigw.CorsOptions(
-                allow_origins=apigw.Cors.ALL_ORIGINS,  # CloudFront deployed url handled easily this way
-                allow_methods=apigw.Cors.ALL_METHODS,
-                allow_headers=apigw.Cors.DEFAULT_HEADERS,
+                # ALL_ORIGINS is kept due to cyclic dependency with CloudFront
+                # (CloudFront URL is unknown until API is deployed)
+                allow_origins=apigw.Cors.ALL_ORIGINS,
+                allow_methods=["GET", "POST", "OPTIONS"],
+                allow_headers=[
+                    "Content-Type",
+                    "Authorization",
+                    "X-Amz-Date",
+                    "X-Api-Key",
+                    "X-Amz-Security-Token",
+                ],
             ),
             deploy_options=apigw.StageOptions(
                 stage_name="prod",

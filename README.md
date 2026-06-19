@@ -39,7 +39,14 @@ Deploy the pipeline stack. Once deployed, the pipeline will automatically pull f
 make deploy
 ```
 
-### 4. Seed Data (Optional)
+### 4. Sync Knowledge Base (Required)
+The S3 bucket will automatically contain your `knowledge_base_docs`, and the Bedrock Knowledge Base is created automatically. However, the data ingestion (sync) is **not automatic**.
+After the deployment succeeds, you must manually sync the files into the OpenSearch vector database:
+1. Go to the AWS Console -> **Amazon Bedrock**.
+2. Navigate to **Knowledge Bases** and select `supply-chain-kb`.
+3. Scroll down to **Data Source** and click the **Sync** button.
+
+### 5. Seed Data (Optional)
 Currently, the DynamoDB tables are deployed empty. To add sample data to `sc-inventory`, `sc-shipments`, etc., you can write a short Python script to populate the tables.
 
 ## Destroying the Infrastructure
