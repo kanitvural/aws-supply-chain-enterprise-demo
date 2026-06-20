@@ -150,7 +150,7 @@ class AgentCoreStack(Stack):
         # ------------------------------------------------------------------
         cr_role.add_to_policy(iam.PolicyStatement(
             actions=["aoss:APIAccessAll"],
-            resources=[collection.attr_arn]
+            resources=["*"]
         ))
         
         index_creator_fn = lambda_.Function(
@@ -187,7 +187,7 @@ class AgentCoreStack(Stack):
         # ------------------------------------------------------------------
         kb_role.add_to_policy(iam.PolicyStatement(
             actions=["aoss:APIAccessAll"],
-            resources=[collection.attr_arn]
+            resources=["*"]
         ))
 
         knowledge_base = bedrock.CfnKnowledgeBase(

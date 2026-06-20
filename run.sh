@@ -28,7 +28,7 @@ deploy() {
 
 destroy() {
   echo "⚠️ Destroying SupplyChainPipeline (Account: $ACCOUNT_ID, Region: $REGION)"
-  cdk destroy SupplyChainPipeline \
+  cdk destroy --all \
     --context @aws-cdk/core:bootstrapQualifier=sc \
     --force
 }
