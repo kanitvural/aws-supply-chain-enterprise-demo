@@ -116,18 +116,30 @@ Whenever a document is uploaded to S3, it is automatically chunked and converted
 
 Ensure you have your AWS CLI configured with administrator privileges.
 
-### 1. Bootstrap your environment
-You only need to do this once for your account/region combination:
+### 1. Clone the Repository & Setup Environment
+First, clone the repository and set up your Python virtual environment:
 ```bash
-make bootstrap
+git clone https://github.com/kanitvural/aws-supply-chain-enterprise-demo.git
+cd aws-supply-chain-enterprise-demo
+
+# Create virtual environment
+python3 -m venv .venv  # Use 'python -m venv .venv' on Windows
+
+# Activate on Mac/Linux:
+source .venv/bin/activate
+
+# Activate on Windows (Command Prompt):
+.venv\Scripts\activate
+
+# Install required dependencies
+pip install -r requirements.txt
+npm install -g aws-cdk
 ```
 
-### 2. Commit your code
-Because this project uses a self-mutating CodePipeline with GitHub (via CodeConnections), you must commit and push your changes to the `main` branch:
+### 2. Bootstrap your AWS Environment
+You only need to do this once for your account/region combination. This provisions the initial CDK resources:
 ```bash
-git add .
-git commit -m "Initial commit for Supply Chain CI/CD"
-git push origin main
+make bootstrap
 ```
 
 ### 3. Deploy the Pipeline (Zero-Touch Deployment)
@@ -140,9 +152,6 @@ Deploy the pipeline stack. Once deployed, the self-mutating CodePipeline will ta
 ```bash
 make deploy
 ```
-
-> [!TIP]
-> **Zero-Touch Deployment:** You do not need to manually trigger Bedrock ingestions or run DynamoDB seeding scripts. The pipeline's `PostDeploymentDataSync` CodeBuild step handles all data hydration automatically!
 
 ---
 

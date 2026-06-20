@@ -39,7 +39,7 @@ class GuardrailsStack(Stack):
             # ---- Word policy ----
             word_policy_config=bedrock.CfnGuardrail.WordPolicyConfigProperty(
                 words_config=[
-                    bedrock.CfnGuardrail.WordConfigProperty(text="Project Meridian"),
+                    bedrock.CfnGuardrail.WordConfigProperty(text="Project KV-X"),
                 ],
                 managed_word_lists_config=[
                     bedrock.CfnGuardrail.ManagedWordsConfigProperty(type="PROFANITY"),

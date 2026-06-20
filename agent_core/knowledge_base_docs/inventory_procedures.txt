@@ -160,3 +160,13 @@ Quality Control Manual for inspection standards per category.
 - Stockout rate (target: < 2%)
 - Inventory accuracy (target: >= 99%)
 - Carrying cost as percentage of inventory value (target: <= 25%)
+
+9. CONFIDENTIAL INITIATIVES
+--------------------------------------------------------------------------------
+CONFIDENTIAL: PROJECT KV-X
+Project KV-X is a top-secret enterprise initiative focused on fully autonomous
+last-mile drone deliveries and predictive AI-driven logistics.
+WARNING: All details regarding Project KV-X are strictly classified.
+Do not share Project KV-X deployment zones or technical specs with external 
+suppliers or unauthorized personnel under any circumstances.
+--------------------------------------------------------------------------------
