@@ -29,13 +29,22 @@ To make this system ready for a Fortune 500 company, we built a highly secure, s
 * **MCP (Model Context Protocol) Gateway**: Instead of giving the AI direct, unchecked access to the databases, we route all AI tool requests through the **AgentCore Gateway**. The Gateway validates the AI's requests against strict JSON schemas before triggering isolated Lambda functions.
 * **Data Protection (Guardrails)**: We implemented Amazon Bedrock Guardrails to prevent data leaks. It automatically blocks inappropriate content, masks PII (like passwords), and anonymizes sensitive corporate data (like internal discount codes). It even strictly blocks mentions of confidential internal projects.
 * **Agentic Memory**: The system uses AgentCore Memory namespaces to separate user preferences, factual semantic memory, and session summaries, meaning the AI remembers context across multiple sessions.
+* **Infinite Scalability (Serverless)**: Thanks to Amazon Bedrock AgentCore, API Gateway, and AWS Lambda, the entire compute layer is 100% serverless. Whether you have 10 users or 10,000 users asking questions simultaneously, the system scales up instantly without any infrastructure bottlenecks, and scales down to zero when idle.
+* **Serverless & Secure Frontend**: The chat UI is hosted as a static site on Amazon S3 and distributed globally via Amazon CloudFront. This is the most cost-effective and scalable frontend architecture possible—there are no running EC2 web servers to maintain or pay for. Origin Access Control (OAC) ensures the S3 bucket is completely blocked from the public internet and only accessible through the secure CloudFront CDN.
+* **Full Observability & Auditability**: Enterprise systems require strict auditing. AgentCore is fully integrated with AWS CloudWatch. Every tool the AI calls, every database response it reads, and its internal "Chain of Thought" reasoning are logged. If the AI makes a decision, administrators can trace exactly *why* and *how* it reached that conclusion.
+
+* **LLMOps & Continuous Evaluation**
+ The architecture includes an automated LLMOps pipeline. A weekly EventBridge cron triggers a Lambda function that initiates an **Automated Amazon Bedrock Evaluation Job**. This compares the model's outputs against synthetic "Golden Datasets" stored in S3, outputting quality scores (Faithfulness, Correctness) to ensure the AI doesn't drift or hallucinate over time. 
+
+> For highly regulated industries, this Lambda trigger can be swapped with AWS Step Functions and Amazon Augmented AI (A2I) to implement a strict Human-in-the-Loop (HITL) review process.
+
 * **Self-Mutating CI/CD Pipeline**: Everything is defined as Infrastructure as Code (AWS CDK). The system automatically tests and deploys itself via CodePipeline on every GitHub commit.
 
 ---
 
 ## 🛠️ Architecture Stack
 
-The project consists of 9 CDK stacks deployed sequentially via CodePipeline:
+The project consists of 11 CDK stacks deployed sequentially via CodePipeline:
 1. **VPC Stack**: Private and public subnets, NAT Gateway, and required VPC Endpoints.
 2. **DynamoDB Stack**: 7 tables for Inventory, Shipments, Routes, Suppliers, Inspections, Compliance, and Standards.
 3. **S3 Assets Stack**: S3 Bucket for Open API schemas and Knowledge Base text documents.
@@ -45,6 +54,8 @@ The project consists of 9 CDK stacks deployed sequentially via CodePipeline:
 7. **API Gateway Stack**: REST API exposing endpoints to the frontend.
 8. **CloudFront Stack**: Secure frontend delivery with Origin Access Control (OAC).
 9. **AgentCore Stack**: OpenSearch Serverless collection, Knowledge Base, Memory, Gateway, and 2 containerized AgentCore Runtimes (Orchestrator and KB Specialist).
+10. **CloudWatch Dashboard Stack**: Custom observability dashboard to track AI token consumption, API latency, and Lambda tool execution metrics.
+11. **MLOps Eval Stack**: S3 Data Lake, EventBridge cron, SNS alerts, and a Lambda function for automated weekly Bedrock Model Evaluation using Golden Datasets.
 
 ---
 
@@ -119,26 +130,19 @@ git commit -m "Initial commit for Supply Chain CI/CD"
 git push origin main
 ```
 
-### 3. Deploy the pipeline
-Deploy the pipeline stack. Once deployed, the pipeline will automatically pull from GitHub and deploy the remaining 9 stacks.
+### 3. Deploy the Pipeline (Zero-Touch Deployment)
+Deploy the pipeline stack. Once deployed, the self-mutating CodePipeline will take over and automatically:
+1. Pull the latest code from GitHub.
+2. Deploy the remaining 10 infrastructure stacks.
+3. Automatically load the mock data into the 7 DynamoDB tables.
+4. Automatically sync the S3 Knowledge Base documents into OpenSearch Serverless.
+
 ```bash
 make deploy
 ```
 
-### 4. Sync Knowledge Base (Required)
-The S3 bucket will automatically contain your `knowledge_base_docs`, and the Bedrock Knowledge Base is created automatically. However, the data ingestion (sync) is **not automatic**.
-After the deployment succeeds, you must manually sync the files into the OpenSearch vector database:
-1. Go to the AWS Console -> **Amazon Bedrock**.
-2. Navigate to **Knowledge Bases** and select `supply-chain-kb`.
-3. Scroll down to **Data Source** and click the **Sync** button.
-
-### 5. Seed Data (Optional)
-Currently, the DynamoDB tables are deployed empty. To add sample data to `sc-inventory`, `sc-shipments`, etc. and test the AI immediately, run the included mock data script:
-
-```bash
-python3 scripts/load_mock_data_to_dynamodb_tables.py
-```
-This script will populate all 7 tables with dummy data (products, delayed shipments, suppliers, etc.) so the AI has real scenarios to interact with.
+> [!TIP]
+> **Zero-Touch Deployment:** You do not need to manually trigger Bedrock ingestions or run DynamoDB seeding scripts. The pipeline's `PostDeploymentDataSync` CodeBuild step handles all data hydration automatically!
 
 ---
 

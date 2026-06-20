@@ -84,3 +84,11 @@ class SupplyChainStage(Stage):
             "CloudFrontStack",
             api_url=api_gw_stack.api.url,
         )
+
+        # 10. CloudWatch Dashboard
+        from stacks.cloudwatch_dashboard_stack import CloudWatchDashboardStack
+        cw_dashboard_stack = CloudWatchDashboardStack(self, "CloudWatchDashboardStack")
+
+        # 11. MLOps LLM Evaluation
+        from stacks.mlops_eval_stack import MlopsEvalStack
+        mlops_stack = MlopsEvalStack(self, "MlopsEvalStack")
