@@ -10,7 +10,7 @@
 [![DynamoDB](https://img.shields.io/badge/Amazon%20DynamoDB-NoSQL-4053D6.svg)](https://aws.amazon.com/dynamodb/)
 [![Vanilla JS](https://img.shields.io/badge/Vanilla%20JS-Frontend-F7DF1E.svg)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 
-![Architecture Diagram](agent_core/images/diagram.png)
+![Architecture Diagram](images/diagram.png)
 
 This project demonstrates a fully functional, enterprise-grade Supply Chain AI Assistant powered by **Amazon Bedrock AgentCore** and the **Strands Framework**. It uses a self-mutating AWS CDK CodePipeline to deploy the entire infrastructure securely and scalably into your AWS environment.
 
