@@ -270,8 +270,9 @@ class AgentCoreStack(Stack):
         sg = ec2.SecurityGroup.from_security_group_id(self, "AgentCoreSG", security_group_id)
         
         network_config = agentcore.RuntimeNetworkConfiguration.using_vpc(
+            self,
             vpc=vpc,
-            subnets=ec2.SubnetSelection(subnet_type=ec2.SubnetType.PRIVATE_WITH_EGRESS),
+            vpc_subnets=ec2.SubnetSelection(subnet_type=ec2.SubnetType.PRIVATE_WITH_EGRESS),
             security_groups=[sg],
         )
 
