@@ -242,25 +242,25 @@ class AgentCoreStack(Stack):
 
         # Strategy 1: Semantic — cross-session factual knowledge
         memory.add_memory_strategy(
-            agentcore.MemoryStrategy.semantic(
-                name="semantic-memories",
-                namespace="supplychain/user/{actorId}/semantic",
+            agentcore.MemoryStrategy.using_semantic(
+                strategy_name="semantic-memories",
+                namespaces=["supplychain/user/{actorId}/semantic"],
             )
         )
 
         # Strategy 2: User Preference — name, preferences, style
         memory.add_memory_strategy(
-            agentcore.MemoryStrategy.user_preference(
-                name="user-preferences",
-                namespace="supplychain/user/{actorId}/preferences",
+            agentcore.MemoryStrategy.using_user_preference(
+                strategy_name="user-preferences",
+                namespaces=["supplychain/user/{actorId}/preferences"],
             )
         )
 
         # Strategy 3: Summarization — per-session conversation summary
         memory.add_memory_strategy(
-            agentcore.MemoryStrategy.summarization(
-                name="session-summaries",
-                namespace="supplychain/user/{actorId}/session/{sessionId}/summary",
+            agentcore.MemoryStrategy.using_summarization(
+                strategy_name="session-summaries",
+                namespaces=["supplychain/user/{actorId}/session/{sessionId}/summary"],
             )
         )
 
