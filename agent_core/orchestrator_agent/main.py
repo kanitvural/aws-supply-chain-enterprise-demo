@@ -24,6 +24,8 @@ from strands.tools.mcp import MCPClient
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# --- Environment Variables ---
+# Loaded from the AgentCore container environment at runtime.
 MODEL_ID = os.environ.get("MODEL_ID", "amazon.nova-pro-v1:0")
 REGION = os.environ.get("AWS_REGION", os.environ.get("AWS_DEFAULT_REGION", "us-east-1"))
 GATEWAY_URL = os.environ.get("GATEWAY_URL", "")
@@ -35,6 +37,8 @@ COGNITO_DOMAIN = os.environ.get("COGNITO_DOMAIN", "")
 COGNITO_CLIENT_ID = os.environ.get("COGNITO_CLIENT_ID", "")
 COGNITO_USER_POOL_ID = os.environ.get("COGNITO_USER_POOL_ID", "")
 
+# --- System Prompt ---
+# The core persona and rulebook for the Amazon Nova Pro Orchestrator Agent.
 SYSTEM_PROMPT = """You are a Supply Chain Management Assistant with access to these tools:
 
 Inventory: list_products (no params), check_inventory (by product_id), update_inventory (product_id, quantity, operation)
@@ -55,6 +59,8 @@ Guidelines:
 
 # ---------------------------------------------------------------------------
 # Cached resources — persist across requests
+# These variables stay alive as long as the Docker container is running,
+# preventing the "Cold Start" delay on subsequent requests.
 # ---------------------------------------------------------------------------
 
 _gateway_client = None
@@ -64,6 +70,10 @@ _model = None
 
 
 def _get_model():
+    """
+    [EXPLANATION]: Initializes the Bedrock LLM (Nova Pro) client.
+    It uses caching (global _model) so it only connects to AWS once.
+    """
     global _model
     if _model is None:
         _model = BedrockModel(
@@ -74,7 +84,11 @@ def _get_model():
 
 
 def _get_cognito_token() -> str:
-    """Get OAuth2 token from Cognito using client_credentials flow."""
+    """
+    [EXPLANATION]: Fetches an OAuth2 'client_credentials' token from AWS Cognito.
+    This token is required to prove the Agent's identity when talking to the Gateway.
+    The client secret is fetched dynamically from Cognito API on the first run.
+    """
     global _cognito_secret
     if not COGNITO_DOMAIN or not COGNITO_CLIENT_ID:
         return None
@@ -100,7 +114,12 @@ def _get_cognito_token() -> str:
 
 
 def _init_gateway():
-    """Initialize Gateway MCP client (cached, persistent connection)."""
+    """
+    [EXPLANATION]: Connects to the AgentCore Gateway using the MCP protocol.
+    It pulls the list of available Lambda tools (Inventory, Logistics, etc.)
+    and their JSON schemas so the Agent knows what tools it can use.
+    Runs only once thanks to caching.
+    """
     global _gateway_client, _gateway_tools
     if _gateway_tools is not None:
         return
@@ -135,15 +154,13 @@ def _init_gateway():
 
 @tool
 def search_knowledge_base(query: str) -> str:
-    """Search the supply chain knowledge base for policies, procedures, and manuals.
-
+    """
+    [EXPLANATION]: Agent-to-Agent (A2A) Tool.
+    Instead of reading the database itself, the Orchestrator delegates the work
+    to a sub-agent (Knowledge Base Specialist) via HTTP.
+    
+    Search the supply chain knowledge base for policies, procedures, and manuals.
     Delegates the query to the KB Specialist Agent via HTTP invocation.
-
-    Args:
-        query: The search query describing what information to find.
-
-    Returns:
-        Relevant passages from the knowledge base documents.
     """
     if not KB_SPECIALIST_RUNTIME_ARN:
         return "Knowledge base specialist agent not configured."
@@ -160,6 +177,9 @@ def search_knowledge_base(query: str) -> str:
             headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"}, method="POST")
         resp = urllib_request.urlopen(req, timeout=90)
         body = resp.read().decode("utf-8", errors="replace")
+        
+        # [EXPLANATION]: The sub-agent responds with a Server-Sent Events (SSE) stream.
+        # We catch the stream line by line and combine it into a single string.
         result_parts = []
         for line in body.split("\n"):
             line = line.strip()
@@ -181,6 +201,7 @@ def search_knowledge_base(query: str) -> str:
         return " ".join(result_parts).strip() or "No response from KB specialist."
 
     try:
+        # Run HTTP request in a thread pool to avoid blocking the async event loop
         with concurrent.futures.ThreadPoolExecutor() as executor:
             return executor.submit(_invoke).result(timeout=100)
     except Exception as e:
@@ -194,8 +215,21 @@ def search_knowledge_base(query: str) -> str:
 
 @asynccontextmanager
 async def lifespan(app):
-    logger.info("Application starting")
-    yield
+    """
+    [EXPLANATION]: Application Lifecycle Manager (Startup / Shutdown).
+    Code before 'yield' runs exactly once when the Docker container starts (Pre-warming).
+    Code after 'yield' runs when the container is gracefully shutting down (Cleanup).
+    """
+    logger.info("Application starting - Pre-warming global resources...")
+    try:
+        _get_model()
+        _init_gateway()
+        logger.info("Pre-warming complete!")
+    except Exception as e:
+        logger.warning("Pre-warming failed (will retry on first request): %s", e)
+    
+    yield  # The server accepts HTTP requests while paused here.
+    
     logger.info("Cleaning up")
     if _gateway_client:
         try:
@@ -208,12 +242,16 @@ async def lifespan(app):
 # App entrypoint
 # ---------------------------------------------------------------------------
 
+# [EXPLANATION]: Initializes the FastAPI/AgentCore Server wrapper.
 app = BedrockAgentCoreApp(lifespan=lifespan)
 
 
 @app.entrypoint
 async def handle(payload, context=None):
-    """Process user queries — creates agent per request with session manager."""
+    """
+    [EXPLANATION]: Main execution loop. This function runs every time a user sends a chat message.
+    It orchestrates the tools, memory injection, guardrails, and LLM inference.
+    """
     user_input = payload.get("prompt", "")
     if not user_input:
         return "Please provide a question about the supply chain."
@@ -222,15 +260,15 @@ async def handle(payload, context=None):
     session_id = getattr(context, "session_id", None) or payload.get("session_id", "default_session")
     logger.info("Request: actor=%s session=%s input=%s", actor_id, session_id, user_input[:80])
 
-    # Init Gateway (cached)
+    # Init Gateway (uses cached version if already pre-warmed)
     _init_gateway()
 
-    # Build tools
+    # Build tools: Combine the MCP lambda tools + the A2A knowledge base tool
     all_tools = list(_gateway_tools or [])
     if KB_SPECIALIST_RUNTIME_ARN:
         all_tools.append(search_knowledge_base)
 
-    # Build session manager for memory (standard Strands integration)
+    # [EXPLANATION]: Initialize Short-Term Memory and Long-Term namespaces.
     session_manager = None
     memory_client = None
     memory_namespaces = {}
@@ -240,6 +278,7 @@ async def handle(payload, context=None):
             from bedrock_agentcore.memory.integrations.strands.config import AgentCoreMemoryConfig
             from bedrock_agentcore.memory import MemoryClient
 
+            # The session manager automatically saves and summarizes short-term chat history
             config = AgentCoreMemoryConfig(
                 memory_id=MEMORY_ID,
                 session_id=session_id,
@@ -249,9 +288,8 @@ async def handle(payload, context=None):
                 agentcore_memory_config=config,
                 region_name=REGION,
             )
-            # Set up cross-session retrieval
+            # Fetch dynamic namespaces for Long-Term semantic memory retrieval
             memory_client = MemoryClient(region_name=REGION)
-            # Load strategy namespaces dynamically
             try:
                 strategies = memory_client.get_memory_strategies(memory_id=MEMORY_ID)
                 for s in strategies:
@@ -286,7 +324,9 @@ async def handle(payload, context=None):
         except Exception as e:
             logger.warning("Memory setup failed: %s", e)
 
-    # Apply guardrail on input BEFORE memory injection (word filter, content filter, PII)
+    # [EXPLANATION]: Apply INPUT Guardrails.
+    # Checks the user's prompt against AWS Bedrock Guardrails (Hate speech, PII, Harmful content)
+    # BEFORE doing any processing or memory retrieval.
     if GUARDRAIL_ID:
         try:
             bedrock_rt = boto3.client("bedrock-runtime", region_name=REGION)
@@ -308,7 +348,9 @@ async def handle(payload, context=None):
         except Exception as e:
             logger.warning("Input guardrail failed: %s", e)
 
-    # Cross-session memory retrieval — inject context from previous sessions
+    # [EXPLANATION]: Cross-Session Memory Injection (Long-Term Memory).
+    # Queries the semantic database using the user's prompt to find relevant past facts (top-k=3),
+    # and silently appends them to the bottom of the user's prompt as context.
     if memory_client and memory_namespaces:
         try:
             all_context = []
@@ -333,7 +375,8 @@ async def handle(payload, context=None):
         except Exception as e:
             logger.warning("Cross-session memory retrieval failed: %s", e)
 
-    # Create agent per request (with session manager for memory)
+    # [EXPLANATION]: Agent Execution.
+    # Boots up the Strands framework with the LLM model, the tool list, and memory context.
     agent = Agent(
         model=_get_model(),
         tools=all_tools,
@@ -342,10 +385,13 @@ async def handle(payload, context=None):
     )
 
     try:
+        # This triggers the "Chain of Thought" reasoning loop and tool execution.
         response = agent(user_input)
         result_text = response.message["content"][0]["text"]
 
-        # Apply guardrail on output manually (anonymization without blocking)
+        # [EXPLANATION]: Apply OUTPUT Guardrails.
+        # Checks the final generated answer (result_text) for harmful content or PII leaks
+        # BEFORE returning it to the user.
         if GUARDRAIL_ID:
             try:
                 bedrock_rt = boto3.client("bedrock-runtime", region_name=REGION)

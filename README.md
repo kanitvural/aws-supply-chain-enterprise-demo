@@ -6,16 +6,22 @@ This project demonstrates a fully functional, enterprise-grade Supply Chain AI A
 
 ## 📦 What Business Problem Does This Solve?
 
-Global supply chains are incredibly complex. Logistics managers, inventory specialists, and quality control officers deal with scattered data across multiple databases, manuals, and tracking systems. When an issue occurs (e.g., a shipment delay or a quality standard failure), it takes hours to trace the impact.
+Global supply chains are incredibly complex. In a traditional enterprise, data is heavily siloed. When a critical issue occurs (e.g., a production line stops because of defective parts), a supply chain manager has to go through a nightmare of manual investigations:
+1. Log into the ERP system to check **inventory levels**.
+2. Open a logistics tracking portal to see where the **cargo ships/trucks** are.
+3. Check the quality control database to see if the **received parts failed inspections**.
+4. Cross-reference supplier databases to find **contact information and compliance ratings**.
+5. Manually read through hundreds of pages of **Quality Control PDF manuals** to figure out the exact corporate procedure for handling defective products.
+
+This process involves manually querying **7 different databases/tables** and reading through massive documents, taking **hours or even days** to resolve.
 
 **This AI Assistant acts as an intelligent "Supply Chain Co-Pilot".** 
-Through a simple chat interface, users can ask natural language questions like:
-* *"Where is the shipment for order #12345, and what is its current status?"*
-* *"Which suppliers provide raw material X, and what is their quality compliance score?"*
-* *"If route A is blocked by a storm, what are my alternative logistics routes?"*
-* *"What is our corporate policy regarding defective inventory returns?"*
+By deploying an autonomous **Agentic Workflow**, we connected these 7 DynamoDB tables (via 4 specialized AWS Lambda Action Groups) and the corporate manuals (via OpenSearch Vector Knowledge Base) directly to the AI's brain. 
 
-The AI doesn't just guess; it **takes action** using specialized tools. It fetches real-time data from databases (Inventory, Logistics, Suppliers) and reads thousands of pages of corporate manuals using RAG (Knowledge Base).
+Now, the manager simply types:
+> *"Did batch BCH-1002 pass inspection? If not, what is the exact corporate procedure for defective parts and who is the supplier?"*
+
+The AI uses **Chain of Thought** reasoning to realize it needs to independently query the Inspections API, then the Supplier API, and finally run a Semantic Search (RAG) over the Knowledge Base. It synthesizes all this data and delivers a perfect, actionable answer in **literally seconds**.
 
 ---
 
@@ -148,6 +154,12 @@ Deploy the pipeline stack. Once deployed, the self-mutating CodePipeline will ta
 
 ```bash
 make deploy
+```
+
+### 4. Get the Live App URL
+Once the deployment is complete, you can easily fetch the live application URL by running:
+```bash
+python scripts/get_app_url.py
 ```
 
 ---
