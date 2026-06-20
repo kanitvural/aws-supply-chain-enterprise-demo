@@ -165,13 +165,15 @@ This architecture is primarily **Serverless** (pay-per-use), making it highly co
 | **Amazon API Gateway** | 30,000 requests via HTTP API ($1.20 per million requests). | **~$0.04** |
 | **Amazon CloudWatch** | Custom Dashboards ($3.00) + ~1 GB Log Ingestion ($0.63/GB). | **~$3.63** |
 | **Amazon CloudFront** | Internal UI hosting. ~10 GB Data Transfer Out ($0.085/GB). | **~$0.85** |
-| **Total Estimated Cost** | | **~$450.07** |
+| **Amazon VPC Network** | 1 NAT Gateway ($37.96) + 7 Interface Endpoints across 2 AZs ($121.61) + Data Processing. | **~$159.93** |
+| **Total Estimated Cost** | | **~$610.00** |
 
 > [!TIP]
-> **Cost Optimization & Alternatives:**
-> Over 50% of the cost comes from the **OpenSearch Serverless** baseline compute (OCU). OpenSearch Serverless Vector collections keep vector graphs entirely in RAM, offering sub-millisecond retrieval latency. 
+> **Cost Optimization & Alternatives (How to reach ~$104/month - 83% Reduction):**
+> If you are building a Proof of Concept (PoC), or if your use-case allows you to forego sub-millisecond search latency and "Defense-Grade" network isolation, you can drastically reduce the cost down to **~$104/month** (an **83% reduction** from the ~$610 total) by making the following two architectural changes:
 > 
-> **Ultra-Low Cost Alternative (S3 Vectors):** If millisecond latency is not a strict requirement for your internal use-case, you can replace OpenSearch Serverless entirely with **Amazon S3 Vector Search**. For 10 GB of vector data and 30,000 queries, S3 Vectors costs approximately **~$4.00/month** ($0.20/GB for PUTs + $0.055 per 1,000 GETs). This single architectural switch drops the **Total Estimated Cost to ~$104.07/month**, which is a massive **77% reduction**!
+> 1. **Ultra-Low Cost Vector Store (Save ~$346/mo - If latency is not critical):** OpenSearch Serverless is expensive because it keeps vector graphs in RAM for sub-millisecond latency. If milisecond-level response times are not a strict requirement for your use-case, you can replace it entirely with **Amazon S3 Vector Search**. For 10 GB of vector data and 30,000 queries, S3 Vectors costs approximately **~$4.00/month**.
+> 2. **Standard AWS Security Network (Save ~$160/mo - If standard security is sufficient):** The current architecture uses a fully isolated VPC with 7 PrivateLink Endpoints and a NAT Gateway to ensure zero public internet routing. If standard AWS IAM security is sufficient and you can forego premium defense-grade network isolation, you can deploy the agents into the standard AWS network. This eliminates all hourly ENI and NAT Gateway charges.
 
 ---
 

@@ -69,6 +69,12 @@ class VpcStack(Stack):
             service=ec2.GatewayVpcEndpointAwsService.S3,
         )
 
+        # Gateway Endpoint — DynamoDB (free, no hourly charge)
+        self.vpc.add_gateway_endpoint(
+            "DynamoDbGatewayEndpoint",
+            service=ec2.GatewayVpcEndpointAwsService.DYNAMODB,
+        )
+
         # ------------------------------------------------------------------
         # Interface Endpoints — private DNS enabled, shared security group
         # ------------------------------------------------------------------
@@ -113,6 +119,15 @@ class VpcStack(Stack):
         self.vpc.add_interface_endpoint(
             "CloudWatchLogsEndpoint",
             service=ec2.InterfaceVpcEndpointAwsService.CLOUDWATCH_LOGS,
+            subnets=private_subnets,
+            security_groups=[self.security_group],
+            private_dns_enabled=True,
+        )
+
+        # Lambda endpoint (needed by AgentCore to invoke Action Group Lambdas internally)
+        self.vpc.add_interface_endpoint(
+            "LambdaEndpoint",
+            service=ec2.InterfaceVpcEndpointAwsService.LAMBDA_,
             subnets=private_subnets,
             security_groups=[self.security_group],
             private_dns_enabled=True,

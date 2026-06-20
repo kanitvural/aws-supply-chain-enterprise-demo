@@ -2,6 +2,7 @@ import json
 import boto3
 import urllib.request
 import time
+import hashlib
 from botocore.auth import SigV4Auth
 from botocore.awsrequest import AWSRequest
 
@@ -57,7 +58,12 @@ def handler(event, context):
         }
     }
     
-    request = AWSRequest(method="PUT", url=url, data=json.dumps(payload).encode('utf-8'))
+    payload_bytes = json.dumps(payload).encode('utf-8')
+    request = AWSRequest(method="PUT", url=url, data=payload_bytes)
+    
+    # OpenSearch Serverless strictly requires the x-amz-content-sha256 header
+    request.headers['x-amz-content-sha256'] = hashlib.sha256(payload_bytes).hexdigest()
+    
     SigV4Auth(credentials, "aoss", region).add_auth(request)
     
     req = urllib.request.Request(url, data=request.body, headers=dict(request.headers), method="PUT")
