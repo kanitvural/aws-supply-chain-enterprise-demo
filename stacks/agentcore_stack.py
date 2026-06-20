@@ -320,6 +320,7 @@ class AgentCoreStack(Stack):
             gateway_name="supply-chain-gateway",
             authorizer_configuration=agentcore.GatewayAuthorizer.using_cognito(
                 user_pool=user_pool,
+                allowed_scopes=["supplychain/read", "supplychain/write"]
             ),
             exception_level=agentcore.GatewayExceptionLevel.DEBUG,
         )
