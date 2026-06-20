@@ -68,10 +68,9 @@ class MlopsEvalStack(Stack):
         self.eval_lambda = lambda_.Function(
             self,
             "MlopsEvalLambda",
-            function_name="sc-mlops-eval-trigger",
             runtime=lambda_.Runtime.PYTHON_3_12,
             handler="mlops_eval_handler.lambda_handler",
-            code=lambda_.Code.from_asset("lambda_funcs"),
+            code=lambda_.Code.from_asset("lambda_funcs/mlops_eval"),
             timeout=Duration.minutes(1),
             environment={
                 "MLOPS_BUCKET": self.mlops_bucket.bucket_name,

@@ -47,10 +47,9 @@ class LambdaStack(Stack):
         self.inventory_lambda = lambda_.Function(
             self,
             "InventoryHandler",
-            function_name="sc-inventory-handler",
             runtime=lambda_.Runtime.PYTHON_3_12,
             handler="inventory-handler.lambda_handler",
-            code=lambda_.Code.from_asset("lambda_funcs"),
+            code=lambda_.Code.from_asset("lambda_funcs/inventory"),
             timeout=Duration.seconds(60),
             environment={
                 "INVENTORY_TABLE_NAME": inventory_table.table_name,
@@ -64,10 +63,9 @@ class LambdaStack(Stack):
         self.logistics_lambda = lambda_.Function(
             self,
             "LogisticsHandler",
-            function_name="sc-logistics-handler",
             runtime=lambda_.Runtime.PYTHON_3_12,
             handler="logistics-handler.lambda_handler",
-            code=lambda_.Code.from_asset("lambda_funcs"),
+            code=lambda_.Code.from_asset("lambda_funcs/logistics"),
             timeout=Duration.seconds(60),
             environment={
                 "SHIPMENT_TABLE_NAME": shipments_table.table_name,
@@ -83,10 +81,9 @@ class LambdaStack(Stack):
         self.supplier_lambda = lambda_.Function(
             self,
             "SupplierHandler",
-            function_name="sc-supplier-handler",
             runtime=lambda_.Runtime.PYTHON_3_12,
             handler="supplier-handler.lambda_handler",
-            code=lambda_.Code.from_asset("lambda_funcs"),
+            code=lambda_.Code.from_asset("lambda_funcs/supplier"),
             timeout=Duration.seconds(60),
             environment={
                 "SUPPLIER_TABLE_NAME": suppliers_table.table_name,
@@ -107,10 +104,9 @@ class LambdaStack(Stack):
         self.quality_lambda = lambda_.Function(
             self,
             "QualityHandler",
-            function_name="sc-quality-handler",
             runtime=lambda_.Runtime.PYTHON_3_12,
             handler="quality-handler.lambda_handler",
-            code=lambda_.Code.from_asset("lambda_funcs"),
+            code=lambda_.Code.from_asset("lambda_funcs/quality"),
             timeout=Duration.seconds(60),
             environment={
                 "INSPECTIONS_TABLE_NAME": inspections_table.table_name,

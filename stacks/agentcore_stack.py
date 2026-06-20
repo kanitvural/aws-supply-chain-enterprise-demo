@@ -158,7 +158,7 @@ class AgentCoreStack(Stack):
             "AossIndexCreatorFn",
             runtime=lambda_.Runtime.PYTHON_3_12,
             handler="aoss_index_creator.handler",
-            code=lambda_.Code.from_asset("lambda_funcs"),
+            code=lambda_.Code.from_asset("lambda_funcs/aoss_index_creator"),
             role=cr_role,
             timeout=Duration.minutes(14),
         )
@@ -372,11 +372,10 @@ class AgentCoreStack(Stack):
         # ------------------------------------------------------------------
         self.chat_lambda = lambda_.Function(
             self,
-            "ChatHandler",
-            function_name="sc-chat-handler",
+            "ChatLambda",
             runtime=lambda_.Runtime.PYTHON_3_12,
             handler="supply-chain-chat.lambda_handler",
-            code=lambda_.Code.from_asset("lambda_funcs"),
+            code=lambda_.Code.from_asset("lambda_funcs/supply_chain_chat"),
             timeout=Duration.seconds(120),
             environment={
                 "COGNITO_DOMAIN": cognito_domain_url,
