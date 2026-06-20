@@ -1,10 +1,10 @@
-{"prompt": "Where is shipment TRK-12345?", "referenceResponse": "Shipment TRK-12345 is currently IN_TRANSIT from Shanghai to the Berlin-Hub. The estimated time of arrival is 2026-06-25."}
+{"prompt": "Where is shipment TRK-12345?", "referenceResponse": "Shipment TRK-12345 is currently IN_TRANSIT from Shanghai to the Ordu-Hub. The estimated time of arrival is 2026-06-25."}
 {"prompt": "Who supplies Lithium-Ion Battery Packs and what is their tier?", "referenceResponse": "Global Tech Batteries (SUP-001) supplies Lithium-Ion Battery Packs. They are a Tier 1 supplier with an 'A' rating."}
-{"prompt": "Check the inventory level for product ID P-002.", "referenceResponse": "The inventory level for product P-002 (Electric Motor 50kW) in the Munich-Hub is 300 units, which is above the reorder threshold of 100."}
-{"prompt": "Is the Shanghai to Hamburg Sea Route currently experiencing any delays?", "referenceResponse": "Yes, the Shanghai to Hamburg Sea Route (RT-AS-EU-01) has a status of WEATHER_WARNING."}
+{"prompt": "Check the inventory level for product ID P-002.", "referenceResponse": "The inventory level for product P-002 (Electric Motor 50kW) in the Istanbul-Hub is 300 units, which is above the reorder threshold of 100."}
+{"prompt": "Is the Shanghai to Istanbul Sea Route currently experiencing any delays?", "referenceResponse": "Yes, the Shanghai to Istanbul Sea Route (RT-AS-EU-01) has a status of WEATHER_WARNING."}
 {"prompt": "Did batch BCH-1002 pass the quality inspection?", "referenceResponse": "No, batch BCH-1002 failed the quality inspection because the voltage variation exceeds 2%."}
 {"prompt": "What is the compliance status for Supplier SUP-001 regarding ISO-9001?", "referenceResponse": "Supplier SUP-001 has a VALID ISO-9001 certification and an environmental score of 92."}
 {"prompt": "What is the maximum noise standard for industrial motors?", "referenceResponse": "According to the corporate standards, the maximum acceptable noise level for industrial motors is 65 decibels."}
 {"prompt": "What is the status of shipment TRK-67890?", "referenceResponse": "Shipment TRK-67890 is DELAYED due to a Customs Hold."}
 {"prompt": "Who is the supplier FastMotors Inc and what is their rating?", "referenceResponse": "FastMotors Inc is a Tier 2 supplier with a 'B' rating."}
-{"prompt": "What is the inventory level for Brake Calipers Set?", "referenceResponse": "There are 80 units of Brake Calipers Set (P-003) at the Frankfurt-Hub, which is below the reorder threshold of 200."}
+{"prompt": "What is the inventory level for Brake Calipers Set?", "referenceResponse": "There are 80 units of Brake Calipers Set (P-003) at the Ankara-Hub, which is below the reorder threshold of 200."}

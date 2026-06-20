@@ -8,9 +8,9 @@ dynamodb = boto3.resource('dynamodb', region_name='eu-central-1')
 def load_inventory():
     table = dynamodb.Table('sc-inventory')
     items = [
-        {"product_id": "P-001", "name": "Lithium-Ion Battery Pack", "quantity": 1500, "warehouse": "Berlin-Hub", "reorder_threshold": 500},
-        {"product_id": "P-002", "name": "Electric Motor 50kW", "quantity": 300, "warehouse": "Munich-Hub", "reorder_threshold": 100},
-        {"product_id": "P-003", "name": "Brake Calipers Set", "quantity": 80, "warehouse": "Frankfurt-Hub", "reorder_threshold": 200}
+        {"product_id": "P-001", "name": "Lithium-Ion Battery Pack", "quantity": 1500, "warehouse": "Ordu-Hub", "reorder_threshold": 500},
+        {"product_id": "P-002", "name": "Electric Motor 50kW", "quantity": 300, "warehouse": "Istanbul-Hub", "reorder_threshold": 100},
+        {"product_id": "P-003", "name": "Brake Calipers Set", "quantity": 80, "warehouse": "Ankara-Hub", "reorder_threshold": 200}
     ]
     with table.batch_writer() as batch:
         for item in items:
@@ -20,9 +20,9 @@ def load_inventory():
 def load_shipments():
     table = dynamodb.Table('sc-shipments')
     items = [
-        {"tracking_number": "TRK-12345", "status": "IN_TRANSIT", "origin": "Shanghai", "destination": "Berlin-Hub", "carrier": "Maersk", "eta": "2026-06-25"},
-        {"tracking_number": "TRK-67890", "status": "DELAYED", "origin": "Taiwan", "destination": "Munich-Hub", "carrier": "FedEx", "eta": "2026-06-22", "delay_reason": "Customs Hold"},
-        {"tracking_number": "TRK-11121", "status": "DELIVERED", "origin": "Frankfurt-Hub", "destination": "Berlin-Hub", "carrier": "DHL", "eta": "2026-06-19"}
+        {"tracking_number": "TRK-12345", "status": "IN_TRANSIT", "origin": "Shanghai", "destination": "Ordu-Hub", "carrier": "Maersk", "eta": "2026-06-25"},
+        {"tracking_number": "TRK-67890", "status": "DELAYED", "origin": "Taiwan", "destination": "Istanbul-Hub", "carrier": "FedEx", "eta": "2026-06-22", "delay_reason": "Customs Hold"},
+        {"tracking_number": "TRK-11121", "status": "DELIVERED", "origin": "Ankara-Hub", "destination": "Ordu-Hub", "carrier": "DHL", "eta": "2026-06-19"}
     ]
     with table.batch_writer() as batch:
         for item in items:
@@ -32,8 +32,8 @@ def load_shipments():
 def load_routes():
     table = dynamodb.Table('sc-routes')
     items = [
-        {"route_id": "RT-EU-01", "name": "Frankfurt to Berlin", "distance_km": 550, "estimated_hours": 6, "status": "CLEAR"},
-        {"route_id": "RT-AS-EU-01", "name": "Shanghai to Hamburg Sea Route", "distance_km": 18000, "estimated_hours": 850, "status": "WEATHER_WARNING"}
+        {"route_id": "RT-EU-01", "name": "Ankara to Ordu", "distance_km": 550, "estimated_hours": 6, "status": "CLEAR"},
+        {"route_id": "RT-AS-EU-01", "name": "Shanghai to Istanbul Sea Route", "distance_km": 18000, "estimated_hours": 850, "status": "WEATHER_WARNING"}
     ]
     with table.batch_writer() as batch:
         for item in items:

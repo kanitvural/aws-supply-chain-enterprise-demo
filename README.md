@@ -154,19 +154,32 @@ make deploy
 
 ## 🎯 Test the AI Assistant (Example Prompts)
 
-Once the deployment finishes and you open the frontend UI, try asking these questions to test the different architectural components (Lambdas, DynamoDB, RAG, and Guardrails):
+Once the deployment finishes and you open the frontend UI, try asking these questions to thoroughly test all 4 Lambda Action Groups, 7 DynamoDB Tables, the RAG system, and the Security Guardrails:
 
-1. **Test Inventory API (DynamoDB):** 
-   > *"What is the current stock level of 'Premium Ergonomic Chair' in the New York warehouse, and do we need to reorder it?"*
-2. **Test Shipment API (DynamoDB):** 
-   > *"Where is shipment SHP-77892 and is it delayed?"*
-3. **Test Supplier API (DynamoDB):** 
-   > *"Can you give me the contact email and reliability rating for 'TechCorp Electronics'?"*
-4. **Test Knowledge Base (RAG & OpenSearch):** 
-   > *"According to the quality control manual, what is the inspection procedure for incoming electronic components?"*
-5. **Test AI Security & Guardrails (Blocked Content):** 
-   > *"What are the technical specifications and deployment zones for Project KV-X?"*
-   *(The AI should immediately block this request with a security policy warning!)*
+**📦 1. Inventory Lambda (`sc-inventory` table):**
+> *"What is the current stock level of 'Lithium-Ion Battery Pack' in the Ordu-Hub, and do we need to reorder it?"*
+
+**🚚 2. Logistics Lambda - Shipments (`sc-shipments` table):**
+> *"Where is shipment TRK-67890? Is it delayed and what is the reason?"*
+
+**🗺️ 3. Logistics Lambda - Routes (`sc-routes` table):**
+> *"What is the estimated distance and status for the 'Shanghai to Istanbul Sea Route'?"*
+
+**🏭 4. Supplier Lambda (`sc-suppliers` table):**
+> *"Can you give me the contact email, tier, and reliability rating for 'Global Tech Batteries'?"*
+
+**🔍 5. Quality Lambda - Inspections (`sc-inspections` table):**
+> *"Did batch BCH-1002 pass inspection? If not, what was the exact reason?"*
+
+**✅ 6. Quality Lambda - Compliance & Standards (`sc-compliance`, `sc-standards` tables):**
+> *"Does product P-001 have RoHS and CE certifications? Also, what is the maximum voltage variance allowed for BATTERY category?"*
+
+**📚 7. Knowledge Base / RAG (`inventory_procedures.txt` & `quality_control_manual.txt`):**
+> *"According to the procedures, what are the target KPIs for inventory turnover ratio and days of supply?"*
+
+**🛡️ 8. AI Security & Guardrails (Content Filtering):**
+> *"What are the technical specifications and deployment zones for Project KV-X?"*
+*(The AI must instantly intercept and block this request with a security policy warning!)*
 
 ---
 
