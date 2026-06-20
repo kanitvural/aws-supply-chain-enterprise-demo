@@ -289,7 +289,7 @@ class AgentCoreStack(Stack):
         kb_runtime = agentcore.Runtime(
             self,
             "KbSpecialistRuntime",
-            runtime_name="kb-specialist",
+            runtime_name="kb_specialist",
             agent_runtime_artifact=kb_specialist_artifact,
             network_configuration=network_config,
             authorizer_configuration=auth_config,
@@ -309,7 +309,7 @@ class AgentCoreStack(Stack):
         gateway = agentcore.Gateway(
             self,
             "SupplyChainGateway",
-            gateway_name="supply-chain-gateway",
+            gateway_name="supply_chain_gateway",
             authorizer_configuration=agentcore.GatewayAuthorizer.using_cognito(
                 user_pool=user_pool,
             ),
