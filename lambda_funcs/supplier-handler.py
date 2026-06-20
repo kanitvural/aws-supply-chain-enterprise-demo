@@ -13,10 +13,23 @@ logger.setLevel(logging.INFO)
 
 dynamodb = boto3.resource("dynamodb")
 TABLE_NAME = os.environ.get("SUPPLIER_TABLE_NAME", "")
-KNOWLEDGE_BASE_ID = os.environ.get("KNOWLEDGE_BASE_ID", "")
 
 table = dynamodb.Table(TABLE_NAME)
 bedrock_agent_runtime = boto3.client("bedrock-agent-runtime")
+ssm_client = boto3.client("ssm")
+
+def get_kb_id():
+    kb_id = os.environ.get("KNOWLEDGE_BASE_ID", "")
+    if kb_id:
+        return kb_id
+    try:
+        response = ssm_client.get_parameter(Name="/supplychain/kb_id")
+        return response["Parameter"]["Value"]
+    except Exception as e:
+        logger.error("Failed to fetch KB ID from SSM: %s", e)
+        return ""
+
+KNOWLEDGE_BASE_ID = get_kb_id()
 
 
 class DecimalEncoder(json.JSONEncoder):

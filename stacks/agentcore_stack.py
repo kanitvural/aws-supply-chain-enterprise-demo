@@ -228,8 +228,14 @@ class AgentCoreStack(Stack):
             )
         )
 
-        # Set Supplier Lambda Environment Var
-        supplier_lambda.add_environment("KNOWLEDGE_BASE_ID", knowledge_base.attr_knowledge_base_id)
+        # Store KB ID in SSM to break cyclic dependency with LambdaStack
+        from aws_cdk import aws_ssm as ssm
+        ssm.StringParameter(
+            self,
+            "KnowledgeBaseIdParam",
+            parameter_name="/supplychain/kb_id",
+            string_value=knowledge_base.attr_knowledge_base_id,
+        )
 
         # ------------------------------------------------------------------
         # AgentCore: Memory with 3 namespace strategies
@@ -309,7 +315,7 @@ class AgentCoreStack(Stack):
         gateway = agentcore.Gateway(
             self,
             "SupplyChainGateway",
-            gateway_name="supply_chain_gateway",
+            gateway_name="supply-chain-gateway",
             authorizer_configuration=agentcore.GatewayAuthorizer.using_cognito(
                 user_pool=user_pool,
             ),
@@ -321,7 +327,7 @@ class AgentCoreStack(Stack):
             gateway.add_lambda_target(
                 name,
                 lambda_function=lambda_fn,
-                schema_configuration=agentcore.SchemaConfiguration.from_s3(assets_bucket, schema_key)
+                tool_schema=agentcore.ToolSchema.from_s3_file(assets_bucket, schema_key)
             )
 
         add_target("inventory-target", inventory_lambda, "schemas/inventory_schema.json")
@@ -343,11 +349,11 @@ class AgentCoreStack(Stack):
             authorizer_configuration=auth_config,
             environment_variables={
                 "MODEL_ID": "amazon.nova-pro-v1:0",
-                "GATEWAY_URL": gateway.endpoint_url,
+                "GATEWAY_URL": gateway.gateway_url,
                 "MEMORY_ID": memory.memory_id,
                 "GUARDRAIL_ID": guardrail_id,
                 "GUARDRAIL_VERSION": guardrail_version,
-                "KB_SPECIALIST_RUNTIME_ARN": kb_runtime.runtime_arn,
+                "KB_SPECIALIST_RUNTIME_ARN": kb_runtime.agent_runtime_arn,
                 "COGNITO_DOMAIN": cognito_domain_url,
                 "COGNITO_CLIENT_ID": app_client.user_pool_client_id,
                 "COGNITO_USER_POOL_ID": user_pool.user_pool_id,
@@ -373,7 +379,7 @@ class AgentCoreStack(Stack):
                 "COGNITO_DOMAIN": cognito_domain_url,
                 "COGNITO_CLIENT_ID": app_client.user_pool_client_id,
                 "COGNITO_USER_POOL_ID": user_pool.user_pool_id,
-                "ORCHESTRATOR_RUNTIME_ARN": orchestrator_runtime.runtime_arn,
+                "ORCHESTRATOR_RUNTIME_ARN": orchestrator_runtime.agent_runtime_arn,
             },
         )
         # Chat handler needs Cognito describe (to fetch client secret at runtime)
@@ -399,6 +405,6 @@ class AgentCoreStack(Stack):
         # ------------------------------------------------------------------
         # Outputs
         # ------------------------------------------------------------------
-        CfnOutput(self, "OrchestratorRuntimeArn", value=orchestrator_runtime.runtime_arn)
-        CfnOutput(self, "GatewayEndpoint", value=gateway.endpoint_url)
+        CfnOutput(self, "OrchestratorRuntimeArn", value=orchestrator_runtime.agent_runtime_arn)
+        CfnOutput(self, "GatewayEndpoint", value=gateway.gateway_url)
         CfnOutput(self, "KnowledgeBaseId", value=knowledge_base.attr_knowledge_base_id)

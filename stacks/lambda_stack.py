@@ -94,10 +94,9 @@ class LambdaStack(Stack):
             },
         )
         suppliers_table.grant_read_data(self.supplier_lambda)
-        # Bedrock Agent Runtime permission for KB retrieval
         self.supplier_lambda.add_to_role_policy(
             iam.PolicyStatement(
-                actions=["bedrock:Retrieve"],
+                actions=["bedrock:Retrieve", "ssm:GetParameter"],
                 resources=["*"],  # KB ARN not yet known; scoped at deploy
             )
         )
