@@ -237,7 +237,7 @@ class AgentCoreStack(Stack):
         memory = agentcore.Memory(
             self,
             "SupplyChainMemory",
-            memory_name="supply-chain-memory",
+            memory_name="supply_chain_memory",
         )
 
         # Strategy 1: Semantic — cross-session factual knowledge
@@ -306,7 +306,8 @@ class AgentCoreStack(Stack):
             self,
             "SupplyChainGateway",
             gateway_name="supply-chain-gateway",
-            authorizer_configuration=agentcore.GatewayAuthorizerConfiguration.cognito(user_pool.user_pool_arn)
+            authorizer_configuration=agentcore.GatewayAuthorizerConfiguration.cognito(user_pool.user_pool_arn),
+            exception_level=agentcore.GatewayExceptionLevel.DEBUG,
         )
 
         # Targets mapping to Lambda functions with S3 schemas
