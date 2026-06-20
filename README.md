@@ -32,12 +32,9 @@ To make this system ready for a Fortune 500 company, we built a highly secure, s
 * **Infinite Scalability (Serverless)**: Thanks to Amazon Bedrock AgentCore, API Gateway, and AWS Lambda, the entire compute layer is 100% serverless. Whether you have 10 users or 10,000 users asking questions simultaneously, the system scales up instantly without any infrastructure bottlenecks, and scales down to zero when idle.
 * **Serverless & Secure Frontend**: The chat UI is hosted as a static site on Amazon S3 and distributed globally via Amazon CloudFront. This is the most cost-effective and scalable frontend architecture possible—there are no running EC2 web servers to maintain or pay for. Origin Access Control (OAC) ensures the S3 bucket is completely blocked from the public internet and only accessible through the secure CloudFront CDN.
 * **Full Observability & Auditability**: Enterprise systems require strict auditing. AgentCore is fully integrated with AWS CloudWatch. Every tool the AI calls, every database response it reads, and its internal "Chain of Thought" reasoning are logged. If the AI makes a decision, administrators can trace exactly *why* and *how* it reached that conclusion.
-
 * **LLMOps & Continuous Evaluation**
  The architecture includes an automated LLMOps pipeline. A weekly EventBridge cron triggers a Lambda function that initiates an **Automated Amazon Bedrock Evaluation Job**. This compares the model's outputs against synthetic "Golden Datasets" stored in S3, outputting quality scores (Faithfulness, Correctness) to ensure the AI doesn't drift or hallucinate over time. 
-
 > For highly regulated industries, this Lambda trigger can be swapped with AWS Step Functions and Amazon Augmented AI (A2I) to implement a strict Human-in-the-Loop (HITL) review process.
-
 * **Self-Mutating CI/CD Pipeline**: Everything is defined as Infrastructure as Code (AWS CDK). The system automatically tests and deploys itself via CodePipeline on every GitHub commit.
 
 ---
@@ -152,6 +149,24 @@ Deploy the pipeline stack. Once deployed, the self-mutating CodePipeline will ta
 ```bash
 make deploy
 ```
+
+---
+
+## 🎯 Test the AI Assistant (Example Prompts)
+
+Once the deployment finishes and you open the frontend UI, try asking these questions to test the different architectural components (Lambdas, DynamoDB, RAG, and Guardrails):
+
+1. **Test Inventory API (DynamoDB):** 
+   > *"What is the current stock level of 'Premium Ergonomic Chair' in the New York warehouse, and do we need to reorder it?"*
+2. **Test Shipment API (DynamoDB):** 
+   > *"Where is shipment SHP-77892 and is it delayed?"*
+3. **Test Supplier API (DynamoDB):** 
+   > *"Can you give me the contact email and reliability rating for 'TechCorp Electronics'?"*
+4. **Test Knowledge Base (RAG & OpenSearch):** 
+   > *"According to the quality control manual, what is the inspection procedure for incoming electronic components?"*
+5. **Test AI Security & Guardrails (Blocked Content):** 
+   > *"What are the technical specifications and deployment zones for Project KV-X?"*
+   *(The AI should immediately block this request with a security policy warning!)*
 
 ---
 
