@@ -85,7 +85,7 @@ class AgentCoreStack(Stack):
         )
 
         # Encryption policy
-        aoss.CfnSecurityPolicy(
+        enc_policy = aoss.CfnSecurityPolicy(
             self,
             "AossEncryptionPolicy",
             name="supply-chain-kb-enc",
@@ -97,9 +97,10 @@ class AgentCoreStack(Stack):
                 "AWSOwnedKey": True
             })
         )
+        collection.add_dependency(enc_policy)
 
         # Network policy
-        aoss.CfnSecurityPolicy(
+        net_policy = aoss.CfnSecurityPolicy(
             self,
             "AossNetworkPolicy",
             name="supply-chain-kb-net",
@@ -114,6 +115,7 @@ class AgentCoreStack(Stack):
                 }
             ])
         )
+        collection.add_dependency(net_policy)
 
         # Data Access policy
         access_policy = aoss.CfnAccessPolicy(

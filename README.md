@@ -145,6 +145,36 @@ Whenever a document is uploaded to S3, it is automatically chunked and converted
 
 ---
 
+## 💰 Enterprise Cost Estimation (Monthly)
+
+This architecture is primarily **Serverless** (pay-per-use), making it highly cost-effective for internal enterprise use-cases. Below is a realistic monthly cost estimation based on standard AWS eu-central-1 (Frankfurt) pricing.
+
+**Assumptions & Scenario:**
+- **Users & Traffic:** 10 active daily users generating **1,000 requests/day** (~30,000 requests/month).
+- **Storage:** **1 TB** in Amazon S3 (Documents, PDFs, logs), **5 GB** in DynamoDB (Supply chain business data).
+- **Vector Database:** **10 GB** of vector embeddings in Amazon OpenSearch Serverless.
+- **AI Models:** Mixed interaction routing using Amazon Bedrock (e.g., Nova Lite for simple tasks, Nova Pro for complex reasoning) managed by AgentCore.
+
+| AWS Service | Cost Factor & Estimation | Approx. Monthly Cost |
+|-------------|-------------------------|----------------------:|
+| **Amazon OpenSearch Serverless** | 4 half-OCUs (Redundant/Multi-AZ deployment).<br>*Note: 1000 requests/day is well within the baseline. If your 10 GB is pure vector embeddings, it may scale up.* | **~$350.00** |
+| **Amazon Bedrock (Nova Models)** | **On-Demand:** ~60M Input Tokens, ~15M Output Tokens/month.<br>Blended 50/50 usage between Nova Lite ($0.078 in / $0.312 out) and Nova Pro ($1.05 in / $4.20 out). | **~$68.00** |
+| **Amazon S3** | 1 TB Standard Storage + Moderate GET/PUT request volume. | **~$25.00** |
+| **Amazon DynamoDB** | 5 GB Storage ($0.306/GB) + On-Demand Read/Write (~30k requests = negligible). | **~$1.54** |
+| **AWS Lambda** | 30,000 executions (~60k GB-sec). $0.20/1M requests + $0.0000166667/GB-s | **~$1.01** |
+| **Amazon API Gateway** | 30,000 requests via HTTP API ($1.20 per million requests). | **~$0.04** |
+| **Amazon CloudWatch** | Custom Dashboards ($3.00) + ~1 GB Log Ingestion ($0.63/GB). | **~$3.63** |
+| **Amazon CloudFront** | Internal UI hosting. ~10 GB Data Transfer Out ($0.085/GB). | **~$0.85** |
+| **Total Estimated Cost** | | **~$450.07** |
+
+> [!TIP]
+> **Cost Optimization & Alternatives:**
+> Over 50% of the cost comes from the **OpenSearch Serverless** baseline compute (OCU). OpenSearch Serverless Vector collections keep vector graphs entirely in RAM, offering sub-millisecond retrieval latency. 
+> 
+> **Ultra-Low Cost Alternative (S3 Vectors):** If millisecond latency is not a strict requirement for your internal use-case, you can replace OpenSearch Serverless entirely with **Amazon S3 Vector Search**. For 10 GB of vector data and 30,000 queries, S3 Vectors costs approximately **~$4.00/month** ($0.20/GB for PUTs + $0.055 per 1,000 GETs). This single architectural switch drops the **Total Estimated Cost to ~$104.07/month**, which is a massive **77% reduction**!
+
+---
+
 ## 🚀 Deployment Instructions
 
 Ensure you have your AWS CLI configured with administrator privileges.

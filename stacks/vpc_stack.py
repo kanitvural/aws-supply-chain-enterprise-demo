@@ -118,6 +118,24 @@ class VpcStack(Stack):
             private_dns_enabled=True,
         )
 
+        # ECR API endpoint (needed by AgentCore to authenticate with ECR)
+        self.vpc.add_interface_endpoint(
+            "EcrApiEndpoint",
+            service=ec2.InterfaceVpcEndpointAwsService.ECR,
+            subnets=private_subnets,
+            security_groups=[self.security_group],
+            private_dns_enabled=True,
+        )
+
+        # ECR Docker endpoint (needed by AgentCore to pull the container image)
+        self.vpc.add_interface_endpoint(
+            "EcrDockerEndpoint",
+            service=ec2.InterfaceVpcEndpointAwsService.ECR_DOCKER,
+            subnets=private_subnets,
+            security_groups=[self.security_group],
+            private_dns_enabled=True,
+        )
+
         # ------------------------------------------------------------------
         # Outputs
         # ------------------------------------------------------------------
