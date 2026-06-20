@@ -160,7 +160,7 @@ class AgentCoreStack(Stack):
             handler="aoss_index_creator.handler",
             code=lambda_.Code.from_asset("lambda_funcs"),
             role=cr_role,
-            timeout=Duration.minutes(3),
+            timeout=Duration.minutes(14),
         )
         
         index_creator_provider = cr.Provider(

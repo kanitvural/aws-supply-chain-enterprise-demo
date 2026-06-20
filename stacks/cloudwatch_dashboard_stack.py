@@ -18,16 +18,34 @@ class CloudWatchDashboardStack(Stack):
 
         # Bedrock Token Usage Widget
         token_widget = cloudwatch.GraphWidget(
-            title="Bedrock Token Usage (Nova Pro/Lite)",
+            title="Bedrock Token Usage (Nova Pro vs Lite)",
             left=[
                 cloudwatch.Metric(
                     namespace="AWS/Bedrock",
                     metric_name="InputTokenCount",
+                    dimensions_map={"ModelId": "amazon.nova-pro-v1:0"},
+                    label="Nova Pro Input",
                     statistic="Sum",
                 ),
                 cloudwatch.Metric(
                     namespace="AWS/Bedrock",
                     metric_name="OutputTokenCount",
+                    dimensions_map={"ModelId": "amazon.nova-pro-v1:0"},
+                    label="Nova Pro Output",
+                    statistic="Sum",
+                ),
+                cloudwatch.Metric(
+                    namespace="AWS/Bedrock",
+                    metric_name="InputTokenCount",
+                    dimensions_map={"ModelId": "amazon.nova-lite-v1:0"},
+                    label="Nova Lite Input",
+                    statistic="Sum",
+                ),
+                cloudwatch.Metric(
+                    namespace="AWS/Bedrock",
+                    metric_name="OutputTokenCount",
+                    dimensions_map={"ModelId": "amazon.nova-lite-v1:0"},
+                    label="Nova Lite Output",
                     statistic="Sum",
                 )
             ],
@@ -41,6 +59,15 @@ class CloudWatchDashboardStack(Stack):
                 cloudwatch.Metric(
                     namespace="AWS/Bedrock",
                     metric_name="InvocationLatency",
+                    dimensions_map={"ModelId": "amazon.nova-pro-v1:0"},
+                    label="Nova Pro Latency",
+                    statistic="Average",
+                ),
+                cloudwatch.Metric(
+                    namespace="AWS/Bedrock",
+                    metric_name="InvocationLatency",
+                    dimensions_map={"ModelId": "amazon.nova-lite-v1:0"},
+                    label="Nova Lite Latency",
                     statistic="Average",
                 )
             ],

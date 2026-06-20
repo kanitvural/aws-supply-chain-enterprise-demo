@@ -1,6 +1,7 @@
 import json
 import boto3
 import urllib.request
+import time
 from botocore.auth import SigV4Auth
 from botocore.awsrequest import AWSRequest
 
@@ -61,14 +62,25 @@ def handler(event, context):
     
     req = urllib.request.Request(url, data=request.body, headers=dict(request.headers), method="PUT")
     
-    try:
-        response = urllib.request.urlopen(req)
-        print("Response:", response.read().decode('utf-8'))
-    except urllib.error.HTTPError as e:
-        err = e.read().decode('utf-8')
-        print(f"HTTPError: {err}")
-        # Ignore resource_already_exists_exception during updates
-        if 'resource_already_exists_exception' not in err:
+    max_retries = 40
+    for attempt in range(max_retries):
+        try:
+            response = urllib.request.urlopen(req)
+            print("Response:", response.read().decode('utf-8'))
+            break
+        except urllib.error.HTTPError as e:
+            err = e.read().decode('utf-8')
+            print(f"HTTPError on attempt {attempt+1}: {err}")
+            # Ignore resource_already_exists_exception during updates
+            if 'resource_already_exists_exception' in err:
+                break
+            
+            # AOSS Data Access policies take time to propagate. Retry on 403.
+            if e.code == 403 and attempt < max_retries - 1:
+                print("Got 403 Forbidden. Access policy might not have propagated yet. Retrying in 15 seconds...")
+                time.sleep(15)
+                continue
+                
             raise Exception(f"Failed to create index: {err}")
             
     return {'PhysicalResourceId': f"{host}/{index_name}"}
