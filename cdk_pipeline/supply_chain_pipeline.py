@@ -37,7 +37,7 @@ class SupplyChainPipelineStack(Stack):
                 commands=[
                     "npm install -g aws-cdk",
                     "pip install -r requirements.txt",
-                    "cdk synth",
+                    "cdk synth --context @aws-cdk/core:bootstrapQualifier=sc",
                 ],
             ),
             # Docker is required for AgentCore Runtime deployment via AgentRuntimeArtifact.from_asset
