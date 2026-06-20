@@ -276,7 +276,10 @@ class AgentCoreStack(Stack):
             security_groups=[sg],
         )
 
-        auth_config = agentcore.RuntimeAuthorizerConfiguration.cognito(user_pool.user_pool_arn)
+        auth_config = agentcore.RuntimeAuthorizerConfiguration.using_cognito(
+            user_pool=user_pool,
+            user_pool_clients=[app_client],
+        )
 
         # ------------------------------------------------------------------
         # AgentCore: KB Specialist Runtime (Nova Lite)
@@ -307,7 +310,9 @@ class AgentCoreStack(Stack):
             self,
             "SupplyChainGateway",
             gateway_name="supply-chain-gateway",
-            authorizer_configuration=agentcore.GatewayAuthorizerConfiguration.cognito(user_pool.user_pool_arn),
+            authorizer_configuration=agentcore.GatewayAuthorizer.using_cognito(
+                user_pool=user_pool,
+            ),
             exception_level=agentcore.GatewayExceptionLevel.DEBUG,
         )
 
