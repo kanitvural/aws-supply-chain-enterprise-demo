@@ -1,8 +1,18 @@
 # AWS Supply Chain Enterprise AI Assistant
 
+<!-- Core Framework & Language -->
+[![AWS CDK](https://img.shields.io/badge/AWS%20CDK-2.259.0-orange.svg)](https://aws.amazon.com/cdk/)
+[![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org/)
+[![Amazon Bedrock](https://img.shields.io/badge/Amazon%20Bedrock-AgentCore-FF9900.svg)](https://aws.amazon.com/bedrock/)
+[![Strands](https://img.shields.io/badge/Strands-Framework-purple.svg)](https://aws.amazon.com/)
+[![MCP](https://img.shields.io/badge/MCP-Protocol-black.svg)](https://modelcontextprotocol.io/)
+[![AWS Lambda](https://img.shields.io/badge/AWS%20Lambda-Serverless-FF9900.svg)](https://aws.amazon.com/lambda/)
+[![DynamoDB](https://img.shields.io/badge/Amazon%20DynamoDB-NoSQL-4053D6.svg)](https://aws.amazon.com/dynamodb/)
+[![Vanilla JS](https://img.shields.io/badge/Vanilla%20JS-Frontend-F7DF1E.svg)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+
 ![Architecture Diagram](agent_core/images/diagram.png)
 
-This project demonstrates a fully functional, enterprise-grade Supply Chain AI Assistant powered by **Amazon Bedrock AgentCore**. It uses a self-mutating AWS CDK CodePipeline to deploy the entire infrastructure securely and scalably into your AWS environment.
+This project demonstrates a fully functional, enterprise-grade Supply Chain AI Assistant powered by **Amazon Bedrock AgentCore** and the **Strands Framework**. It uses a self-mutating AWS CDK CodePipeline to deploy the entire infrastructure securely and scalably into your AWS environment.
 
 ## 📦 What Business Problem Does This Solve?
 
@@ -22,6 +32,26 @@ Now, the manager simply types:
 > *"Did batch BCH-1002 pass inspection? If not, what is the exact corporate procedure for defective parts and who is the supplier?"*
 
 The AI uses **Chain of Thought** reasoning to realize it needs to independently query the Inspections API, then the Supplier API, and finally run a Semantic Search (RAG) over the Knowledge Base. It synthesizes all this data and delivers a perfect, actionable answer in **literally seconds**.
+
+---
+
+## 📂 Project Structure Overview
+
+```text
+📦 aws-supply-chain-enterprise-demo/
+├── 📁 agent_core/             # Strands Framework Agents (Orchestrator, KB Specialist)
+├── 📁 app/                    # Frontend Chat UI (Static HTML/CSS/JS)
+├── 📁 cdk_pipeline/           # Self-mutating CI/CD CodePipeline definition
+├── 📁 lambda_funcs/           # MCP Tool Handlers & MLOps Evaluation Lambdas
+├── 📁 scripts/                # Utility scripts (Mock data loader, URL fetcher)
+├── 📁 stacks/                 # 11 AWS CDK Infrastructure definitions
+├── 📄 app.py                  # CDK app entry point
+├── 📄 cdk.json                # CDK configuration
+├── 📄 Makefile                # Deployment commands
+├── 📄 run.sh                  # Deployment bash scripts
+├── 📄 requirements.txt        # Python dependencies
+└── 📄 README.md               # Documentation
+```
 
 ---
 
