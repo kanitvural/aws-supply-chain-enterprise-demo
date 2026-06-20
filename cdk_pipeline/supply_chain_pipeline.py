@@ -81,3 +81,14 @@ class SupplyChainPipelineStack(Stack):
             ]
         )
         prod_stage.add_post(post_deploy_step)
+
+        # Build the pipeline to generate the underlying CodeBuild projects
+        pipeline.build_pipeline()
+
+        # Grant self-mutation role access to read SSM bootstrap version
+        pipeline.self_mutation_project.role.add_to_principal_policy(
+            iam.PolicyStatement(
+                actions=["ssm:GetParameter"],
+                resources=[f"arn:aws:ssm:{self.region}:{self.account}:parameter/cdk-bootstrap/*/version"],
+            )
+        )

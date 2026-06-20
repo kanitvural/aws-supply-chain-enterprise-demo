@@ -1,7 +1,7 @@
 # AWS Supply Chain Enterprise AI Assistant
 
 <!-- Core Framework & Language -->
-[![AWS CDK](https://img.shields.io/badge/AWS%20CDK-2.259.0-orange.svg)](https://aws.amazon.com/cdk/)
+[![AWS CDK](https://img.shields.io/badge/AWS%20CDK-2.1127.0-orange.svg)](https://aws.amazon.com/cdk/)
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org/)
 [![Amazon Bedrock](https://img.shields.io/badge/Amazon%20Bedrock-AgentCore-FF9900.svg)](https://aws.amazon.com/bedrock/)
 [![Strands](https://img.shields.io/badge/Strands-Framework-purple.svg)](https://aws.amazon.com/)
@@ -149,11 +149,13 @@ Whenever a document is uploaded to S3, it is automatically chunked and converted
 
 Ensure you have your AWS CLI configured with administrator privileges.
 
-### 1. Clone the Repository & Setup Environment
-First, clone the repository and set up your Python virtual environment:
+### 1. Setup Your Own GitHub Repository & Environment
+Since the AWS CodePipeline requires access to the source code, you must push this code to your own GitHub account:
+1. **Fork** this repository or clone it and push it to a new private/public repository on your GitHub account.
+2. Clone your repository locally and set up your Python virtual environment:
 ```bash
-git clone https://github.com/kanitvural/aws-supply-chain-enterprise-demo.git
-cd aws-supply-chain-enterprise-demo
+git clone https://github.com/<your-username>/<your-repo-name>.git
+cd <your-repo-name>
 
 # Create virtual environment
 python3 -m venv .venv  # Use 'python -m venv .venv' on Windows
@@ -169,13 +171,28 @@ pip install -r requirements.txt
 npm install -g aws-cdk
 ```
 
-### 2. Bootstrap your AWS Environment
+### 2. Configure AWS CodeStar Connection for GitHub
+The pipeline pulls the source code directly from GitHub. You must configure an AWS CodeStar Connection:
+1. Go to the **AWS Console** -> **Developer Tools** -> **Settings** -> **Connections**.
+2. Click **Create connection**, select **GitHub**, and follow the prompts to authorize the AWS Connector for GitHub.
+3. Make sure to grant access to **your repository** (e.g., `<your-repo-name>`).
+4. Copy the newly created **Connection ARN**.
+5. Open `cdk.json` in the root of the project. Inside the `"context"` JSON block, update the following properties to match your setup:
+   ```json
+   "context": {
+     "githubConnectionArn": "arn:aws:codeconnections:eu-central-1:123456789012:connection/...",
+     "githubRepo": "<your-username>/<your-repo-name>",
+     "githubBranch": "main"
+   }
+   ```
+
+### 3. Bootstrap your AWS Environment
 You only need to do this once for your account/region combination. This provisions the initial CDK resources:
 ```bash
 make bootstrap
 ```
 
-### 3. Deploy the Pipeline (Zero-Touch Deployment)
+### 4. Deploy the Pipeline (Zero-Touch Deployment)
 Deploy the pipeline stack. Once deployed, the self-mutating CodePipeline will take over and automatically:
 1. Pull the latest code from GitHub.
 2. Deploy the remaining 10 infrastructure stacks.
