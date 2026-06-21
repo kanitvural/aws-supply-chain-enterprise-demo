@@ -35,6 +35,26 @@ The AI uses **Chain of Thought** reasoning to realize it needs to independently 
 
 ---
 
+## 🛠️ AWS Architecture & Services Used
+
+This project implements a fully managed, scalable, and secure architecture utilizing the following core AWS services:
+
+- **Amazon Bedrock (AgentCore):** The brain of the assistant. Uses foundation models (Amazon Nova Pro/Lite) for reasoning, multi-step planning (Chain of Thought), and executing agentic workflows.
+- **Amazon OpenSearch Serverless:** A high-performance vector database storing embeddings for corporate manuals, enabling Retrieval-Augmented Generation (RAG) with sub-millisecond search latency.
+- **AWS Lambda:** Serverless compute for the Agent Action Groups (Inventory, Logistics, Quality Control, and Supply Chain) and Custom CloudFormation Resources.
+- **Amazon DynamoDB:** A highly scalable NoSQL database hosting 7 different tables (Inventory, Shipments, Inspections, Suppliers, etc.) simulating the enterprise data lake.
+- **Amazon Cognito:** Secures the web UI by handling user authentication, authorization, and JWT token management.
+- **Amazon API Gateway:** Exposes the Bedrock Agent to the frontend via a secure, RESTful HTTP API endpoint.
+- **Amazon S3 & CloudFront:** Hosts the Vanilla JS frontend application and serves as the raw storage layer for Knowledge Base documents (PDFs, text files).
+- **Amazon VPC (PrivateLink & NAT Gateway):** Ensures enterprise-grade security by keeping all AI reasoning, database queries, and inter-service communication completely isolated from the public internet.
+- **AWS CodePipeline & CodeBuild:** Provides a fully automated, self-mutating CI/CD pipeline that seamlessly deploys infrastructure updates and builds Docker images upon git commits.
+- **Amazon ECR (Elastic Container Registry):** Securely stores and manages the Docker container images required by the AgentCore environment.
+- **Amazon CloudWatch:** Delivers comprehensive observability through custom dashboards, metric tracking, and centralized log management for the entire architecture.
+- **Amazon EventBridge & SNS:** Orchestrates event-driven workflows and delivers decoupled, instant notifications for critical supply chain alerts (e.g., failed quality inspections).
+- **AWS CDK (Cloud Development Kit):** Defines the entire infrastructure as code (IaC) in Python, ensuring reproducible deployments.
+
+---
+
 ## 📂 Project Structure Overview
 
 ```text
@@ -274,10 +294,22 @@ Once the deployment finishes and you open the frontend UI, try asking these ques
 
 ---
 
-## 🗑️ Destroying the Infrastructure
+## 🗑️ Destroying the Infrastructure (Important to avoid billing!)
 
-To remove the CodePipeline:
-```bash
-make destroy
-```
-Then, go to the AWS CloudFormation Console and manually delete the `SupplyChainStage` stacks.
+Because this project uses AWS CDK Pipelines (a self-mutating CI/CD architecture), running `make destroy` locally **will only delete the Pipeline itself, NOT the actual application infrastructure!**
+
+To completely remove the project and stop all billing, you **MUST** perform both steps:
+
+1. **Delete the Pipeline (Local):**
+   ```bash
+   make destroy
+   ```
+
+2. **Delete the Application Stacks (Manual via AWS Console):**
+   > [!WARNING]
+   > If you skip this step, OpenSearch Serverless and NAT Gateway will continue to generate charges!
+   
+   - Log in to the **AWS CloudFormation Console**.
+   - Search for stacks starting with `Prod-` (e.g., `Prod-AgentCoreStack`, `Prod-LambdaStack`, `Prod-DataStack`, `Prod-VpcStack`).
+   - Select them and click **Delete**. 
+   - *(Tip: Delete them in reverse order, starting with AgentCoreStack/LambdaStack, then DataStack, and finally VpcStack to avoid dependency errors).*

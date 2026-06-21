@@ -176,7 +176,7 @@ class AgentCoreStack(Stack):
             properties={
                 "CollectionEndpoint": collection.attr_collection_endpoint,
                 "Region": self.region,
-                "IndexName": "supply-chain-kb-index",
+                "IndexName": "supply-chain-kb-index-v2",
             }
         )
         index_creation.node.add_dependency(access_policy)
@@ -210,7 +210,7 @@ class AgentCoreStack(Stack):
                         text_field="AMAZON_BEDROCK_TEXT_CHUNK",
                         metadata_field="AMAZON_BEDROCK_METADATA"
                     ),
-                    vector_index_name="supply-chain-kb-index"
+                    vector_index_name="supply-chain-kb-index-v2"
                 )
             )
         )

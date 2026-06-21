@@ -40,7 +40,7 @@ def handler(event, context):
                     "dimension": 1024,
                     "method": {
                         "name": "hnsw",
-                        "engine": "nmslib",
+                        "engine": "faiss",
                         "space_type": "cosinesimil"
                     }
                 },
