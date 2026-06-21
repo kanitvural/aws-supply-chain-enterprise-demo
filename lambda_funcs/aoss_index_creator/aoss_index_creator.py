@@ -62,6 +62,7 @@ def handler(event, context):
     request = AWSRequest(method="PUT", url=url, data=payload_bytes)
     
     # OpenSearch Serverless strictly requires the x-amz-content-sha256 header
+    request.headers['Content-Type'] = 'application/json'
     request.headers['x-amz-content-sha256'] = hashlib.sha256(payload_bytes).hexdigest()
     
     SigV4Auth(credentials, "aoss", region).add_auth(request)

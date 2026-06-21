@@ -150,7 +150,7 @@ Whenever a document is uploaded to S3, it is automatically chunked and converted
 This architecture is primarily **Serverless** (pay-per-use), making it highly cost-effective for internal enterprise use-cases. Below is a realistic monthly cost estimation based on standard AWS eu-central-1 (Frankfurt) pricing.
 
 **Assumptions & Scenario:**
-- **Users & Traffic:** 10 active daily users generating **1,000 requests/day** (~30,000 requests/month).
+- **Users & Traffic:** 100 active daily users (Supply Chain Planners & Managers) generating **1,000 requests/day** (~30,000 requests/month).
 - **Storage:** **1 TB** in Amazon S3 (Documents, PDFs, logs), **5 GB** in DynamoDB (Supply chain business data).
 - **Vector Database:** **10 GB** of vector embeddings in Amazon OpenSearch Serverless.
 - **AI Models:** Mixed interaction routing using Amazon Bedrock (e.g., Nova Lite for simple tasks, Nova Pro for complex reasoning) managed by AgentCore.
