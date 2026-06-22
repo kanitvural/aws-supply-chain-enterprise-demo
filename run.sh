@@ -55,6 +55,16 @@ destroy() {
     echo "✅ Deleted $stack"
   done
 
+  echo "🧹 Emptying Pipeline Artifacts Bucket..."
+  # Find the pipeline artifacts bucket and empty it before destroying
+  PIPELINE_BUCKET=$(aws s3api list-buckets --query "Buckets[?contains(Name, 'supplychainpipeline') && contains(Name, 'artifact')].Name" --output text 2>/dev/null || echo "")
+  if [[ -n "$PIPELINE_BUCKET" && "$PIPELINE_BUCKET" != "None" ]]; then
+    for bucket in $PIPELINE_BUCKET; do
+      echo "   -> Emptying $bucket"
+      python3 -c "import boto3; s3=boto3.resource('s3'); b=s3.Bucket('$bucket'); b.object_versions.delete()" 2>/dev/null || true
+    done
+  fi
+
   echo "⚠️ Destroying the Pipeline stack itself..."
   cdk destroy --all \
     --context @aws-cdk/core:bootstrapQualifier=sc \

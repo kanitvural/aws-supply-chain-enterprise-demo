@@ -9,6 +9,10 @@
           "type": "string",
           "description": "The product identifier to check quality inspections for."
         },
+        "product_name": {
+          "type": "string",
+          "description": "The name of the product if the ID is unknown."
+        },
         "batch_id": {
           "type": "string",
           "description": "The batch identifier to check quality inspections for."
@@ -27,12 +31,16 @@
           "type": "string",
           "description": "The unique identifier of the entity to check compliance for."
         },
+        "entity_name": {
+          "type": "string",
+          "description": "The name of the entity if the ID is unknown."
+        },
         "entity_type": {
           "type": "string",
           "description": "The type of entity: product or supplier."
         }
       },
-      "required": ["entity_id", "entity_type"]
+      "required": ["entity_type"]
     }
   },
   {

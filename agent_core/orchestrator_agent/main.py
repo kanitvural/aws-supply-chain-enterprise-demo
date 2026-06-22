@@ -49,6 +49,7 @@ Knowledge Base: search_knowledge_base (search policies, procedures, manuals by q
 
 Guidelines:
 - When users ask to list or see all products, use list_products.
+- If a user asks about a product by name, you MUST use list_products first to find its exact product_id before calling check_inventory or update_inventory.
 - When users ask about shipments, use list_shipments.
 - When users ask about policies, procedures, or manuals, use search_knowledge_base.
 - Always use the appropriate tool to answer questions with real data.

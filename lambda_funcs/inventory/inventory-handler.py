@@ -41,20 +41,30 @@ def list_products(params: dict) -> dict:
 
 
 def check_inventory(params: dict) -> dict:
-    """Look up a product by product_id."""
+    """Look up a product by product_id or product_name."""
     product_id = params.get("product_id")
-    if not product_id:
-        return {"error": "Missing required parameter: product_id", "status": 400}
+    product_name = params.get("product_name")
+
+    if not product_id and not product_name:
+        return {"error": "Missing required parameter: either product_id or product_name must be provided", "status": 400}
 
     try:
-        resp = table.get_item(Key={"product_id": product_id})
+        if product_id:
+            resp = table.get_item(Key={"product_id": product_id})
+            item = resp.get("Item")
+        else:
+            # Search by name using a scan (OK for small datasets)
+            from boto3.dynamodb.conditions import Attr
+            resp = table.scan(FilterExpression=Attr("name").eq(product_name))
+            items = resp.get("Items", [])
+            item = items[0] if items else None
+
     except ClientError as exc:
         logger.error("DynamoDB error checking inventory: %s", exc)
         return {"error": "Database operation failed", "status": 500}
 
-    item = resp.get("Item")
     if not item:
-        return {"error": "Item not found", "status": 404}
+        return {"error": f"Item not found (Search: ID={product_id}, Name={product_name})", "status": 404}
     return item
 
 

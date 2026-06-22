@@ -8,9 +8,13 @@
         "supplier_id": {
           "type": "string",
           "description": "The unique identifier of the supplier to retrieve."
+        },
+        "supplier_name": {
+          "type": "string",
+          "description": "The name of the supplier to search for if the ID is unknown."
         }
       },
-      "required": ["supplier_id"]
+      "required": []
     }
   },
   {

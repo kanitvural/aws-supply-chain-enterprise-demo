@@ -4,6 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Supply Chain Assistant</title>
+  <!-- Markdown & Math Support -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -365,77 +373,27 @@
           var keepLists = false;
           for (var j = i + 1; j < lines.length; j++) {
             if (lines[j].trim() === '') continue;
-            if (lines[j].match(/^(\s*)([-*])\s+/) || lines[j].match(/^(\s*)\d+\.\s+/)) keepLists = true;
             break;
           }
-          if (!keepLists) {
-            closeAllLists();
-            result.push('<br>');
-          }
-          continue;
         }
-
-        // Headers
-        var hMatch = line.match(/^(#{1,3})\s+(.+)$/);
-        if (hMatch) {
-          closeAllLists();
-          var level = hMatch[1].length;
-          var sizes = {1: '16px', 2: '15px', 3: '14px'};
-          result.push('<strong style="font-size:' + sizes[level] + '">' + inlineFormat(hMatch[2]) + '</strong>');
-          continue;
-        }
-
-        // Unordered list: - item or * item (with indentation)
-        var ulMatch = line.match(/^(\s*)([-*])\s+(.+)$/);
-        if (ulMatch) {
-          var indent = ulMatch[1].length;
-          // Close deeper or same-level lists of different type
-          while (listStack.length > 0 && listStack[listStack.length - 1].indent > indent) {
-            result.push('</' + listStack.pop().type + '>');
-          }
-          if (listStack.length === 0 || listStack[listStack.length - 1].indent < indent) {
-            listStack.push({type: 'ul', indent: indent});
-            result.push('<ul>');
-          } else if (listStack[listStack.length - 1].type !== 'ul') {
-            result.push('</' + listStack.pop().type + '>');
-            listStack.push({type: 'ul', indent: indent});
-            result.push('<ul>');
-          }
-          result.push('<li>' + inlineFormat(ulMatch[3]) + '</li>');
-          continue;
-        }
-
-        // Ordered list: 1. item
-        var olMatch = line.match(/^(\s*)\d+\.\s+(.+)$/);
-        if (olMatch) {
-          var indent = olMatch[1].length;
-          while (listStack.length > 0 && listStack[listStack.length - 1].indent > indent) {
-            result.push('</' + listStack.pop().type + '>');
-          }
-          if (listStack.length === 0 || listStack[listStack.length - 1].indent < indent) {
-            listStack.push({type: 'ol', indent: indent});
-            result.push('<ol>');
-          } else if (listStack[listStack.length - 1].type !== 'ol') {
-            result.push('</' + listStack.pop().type + '>');
-            listStack.push({type: 'ol', indent: indent});
-            result.push('<ol>');
-          }
-          result.push('<li>' + inlineFormat(olMatch[2]) + '</li>');
-          continue;
-        }
-
-        // Regular text
-        closeAllLists();
-        result.push(inlineFormat(line));
       }
+      return result.join('');
+    }
 
-      // Close any remaining open lists
-      closeAllLists();
-      if (inCodeBlock) {
-        result.push('<pre><code>' + escapeHtml(codeLines.join('\n')) + '</code></pre>');
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function renderMarkdown(text) {
+      if (typeof marked !== 'undefined') {
+        return marked.parse(text);
       }
-
-      return result.join('\n');
+      return escapeHtml(text).replace(/\n/g, '<br>');
     }
 
     function addMessage(text, role, skipSave) {
@@ -463,6 +421,9 @@
       if (!skipSave && role !== "system") {
         addMessageToSession(activeId, text, role);
         renderSessionList();
+      }
+      if (typeof MathJax !== 'undefined' && MathJax.typesetPromise) {
+        MathJax.typesetPromise([messagesEl]).catch(function (err) { console.log(err); });
       }
     }
 

@@ -72,6 +72,8 @@ class SupplyChainPipelineStack(Stack):
                 "python scripts/load_mock_data_to_dynamodb_tables.py",
                 "echo '🧠 Triggering Amazon Bedrock Knowledge Base synchronization...'",
                 "python scripts/sync_knowledge_base.py",
+                "echo '🚀 Invalidating CloudFront cache for instant UI updates...'",
+                "python scripts/cloudfront_cache_invalidation.py",
                 "echo '✅ Zero-Touch Deployment: Data hydration and sync completed successfully!'"
             ],
             role_policy_statements=[
@@ -88,6 +90,13 @@ class SupplyChainPipelineStack(Stack):
                         "bedrock:ListKnowledgeBases",
                         "bedrock:ListDataSources",
                         "bedrock:StartIngestionJob"
+                    ],
+                    resources=["*"]
+                ),
+                iam.PolicyStatement(
+                    actions=[
+                        "cloudfront:CreateInvalidation",
+                        "cloudfront:ListDistributions"
                     ],
                     resources=["*"]
                 )

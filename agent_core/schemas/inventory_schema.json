@@ -10,16 +10,20 @@
   },
   {
     "name": "check_inventory",
-    "description": "Check inventory details for a specific product including quantity, location, and status.",
+    "description": "Check inventory details for a specific product. You MUST provide either product_id or product_name.",
     "inputSchema": {
       "type": "object",
       "properties": {
         "product_id": {
           "type": "string",
-          "description": "The unique identifier of the product to check inventory for."
+          "description": "The unique identifier of the product (e.g., P-001)."
+        },
+        "product_name": {
+          "type": "string",
+          "description": "The name of the product to search for if the ID is unknown."
         }
       },
-      "required": ["product_id"]
+      "required": []
     }
   },
   {

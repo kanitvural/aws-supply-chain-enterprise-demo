@@ -40,20 +40,28 @@ class DecimalEncoder(json.JSONEncoder):
 
 
 def get_supplier(params: dict) -> dict:
-    """Look up a supplier by supplier_id."""
+    """Look up a supplier by supplier_id or supplier_name."""
     supplier_id = params.get("supplier_id")
-    if not supplier_id:
-        return {"error": "Missing required parameter: supplier_id", "status": 400}
+    supplier_name = params.get("supplier_name")
+
+    if not supplier_id and not supplier_name:
+        return {"error": "Missing required parameter: either supplier_id or supplier_name must be provided", "status": 400}
 
     try:
-        resp = table.get_item(Key={"supplier_id": supplier_id})
+        if supplier_id:
+            resp = table.get_item(Key={"supplier_id": supplier_id})
+            item = resp.get("Item")
+        else:
+            from boto3.dynamodb.conditions import Attr
+            resp = table.scan(FilterExpression=Attr("name").eq(supplier_name))
+            items = resp.get("Items", [])
+            item = items[0] if items else None
     except ClientError as exc:
         logger.error("DynamoDB error getting supplier: %s", exc)
         return {"error": "Database operation failed", "status": 500}
 
-    item = resp.get("Item")
     if not item:
-        return {"error": "Item not found", "status": 404}
+        return {"error": f"Item not found (Search: ID={supplier_id}, Name={supplier_name})", "status": 404}
     return item
 
 

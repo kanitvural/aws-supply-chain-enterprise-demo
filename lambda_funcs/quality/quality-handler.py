@@ -30,12 +30,13 @@ class DecimalEncoder(json.JSONEncoder):
 
 
 def check_quality(params: dict) -> dict:
-    """Query inspection results by product_id (GSI) or batch_id (partition key)."""
+    """Query inspection results by product_id, product_name, or batch_id."""
     product_id = params.get("product_id")
+    product_name = params.get("product_name")
     batch_id = params.get("batch_id")
 
-    if not product_id and not batch_id:
-        return {"error": "At least one of product_id or batch_id is required", "status": 400}
+    if not product_id and not product_name and not batch_id:
+        return {"error": "At least one of product_id, product_name, or batch_id is required", "status": 400}
 
     try:
         if batch_id:
@@ -44,8 +45,7 @@ def check_quality(params: dict) -> dict:
             if not item:
                 return {"error": "Item not found", "status": 404}
             return item
-        else:
-            # Query the ProductIndex GSI by product_id
+        elif product_id:
             resp = inspections_table.query(
                 IndexName="ProductIndex",
                 KeyConditionExpression=Key("product_id").eq(product_id),
@@ -54,34 +54,46 @@ def check_quality(params: dict) -> dict:
             if not items:
                 return {"error": "Item not found", "status": 404}
             return {"inspections": items, "count": len(items)}
-
+        else:
+            from boto3.dynamodb.conditions import Attr
+            resp = inspections_table.scan(FilterExpression=Attr("product_name").eq(product_name))
+            items = resp.get("Items", [])
+            if not items:
+                return {"error": "Item not found", "status": 404}
+            return {"inspections": items, "count": len(items)}
     except ClientError as exc:
         logger.error("DynamoDB error checking quality: %s", exc)
         return {"error": "Database operation failed", "status": 500}
 
 
 def get_compliance(params: dict) -> dict:
-    """Look up compliance record by entity_id and entity_type."""
+    """Look up compliance record by entity_id or entity_name, and entity_type."""
     entity_id = params.get("entity_id")
-    if not entity_id:
-        return {"error": "Missing required parameter: entity_id", "status": 400}
-
+    entity_name = params.get("entity_name")
     entity_type = params.get("entity_type")
+
     if not entity_type:
         return {"error": "Missing required parameter: entity_type", "status": 400}
-
+    if not entity_id and not entity_name:
+        return {"error": "Missing required parameter: either entity_id or entity_name must be provided", "status": 400}
     if entity_type not in ("product", "supplier"):
         return {"error": f"Invalid entity_type: {entity_type}. Must be product or supplier", "status": 400}
 
     try:
-        resp = compliance_table.get_item(Key={"entity_id": entity_id, "entity_type": entity_type})
+        if entity_id:
+            resp = compliance_table.get_item(Key={"entity_id": entity_id, "entity_type": entity_type})
+            item = resp.get("Item")
+        else:
+            from boto3.dynamodb.conditions import Attr
+            resp = compliance_table.scan(FilterExpression=Attr("entity_type").eq(entity_type) & Attr("name").eq(entity_name))
+            items = resp.get("Items", [])
+            item = items[0] if items else None
     except ClientError as exc:
         logger.error("DynamoDB error getting compliance: %s", exc)
         return {"error": "Database operation failed", "status": 500}
 
-    item = resp.get("Item")
     if not item:
-        return {"error": "Item not found", "status": 404}
+        return {"error": f"Item not found (Search: ID={entity_id}, Name={entity_name})", "status": 404}
     return item
 
 
