@@ -31,3 +31,4 @@ COPY main.py .
 # OpenTelemetry auto-instrumentation wraps the Python process to capture
 # all HTTP, boto3, and framework calls for distributed tracing in CloudWatch
 CMD ["opentelemetry-instrument", "python", "main.py"]
+# Cache bust 2 for ARM64 CodeBuild
