@@ -34,14 +34,18 @@ def lambda_handler(event, context):
                                     's3Uri': f's3://{s3_bucket}/golden_datasets/rag_golden.jsonl'
                                 }
                             },
-                            'metricNames': ['Correctness', 'Faithfulness']
+                            'metricNames': [
+                                'Builtin.Accuracy', 
+                                'Builtin.Robustness', 
+                                'Builtin.Toxicity'
+                            ]
                         }
                     ]
                 }
             },
             inferenceConfig={
                 'models': [
-                    {'bedrockModel': {'modelIdentifier': 'amazon.nova-lite-v1:0'}}
+                    {'bedrockModel': {'modelIdentifier': 'eu.amazon.nova-lite-v1:0'}}
                 ]
             },
             outputDataConfig={

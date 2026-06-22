@@ -113,7 +113,7 @@ def lambda_handler(event, context):
         tool_name = extended_name.split("___")[1] if "___" in extended_name else extended_name
     except (AttributeError, KeyError, TypeError):
         tool_name = event.get("tool_name")
-    params = event if "supplier_id" in event or "query" in event else event.get("input", event)
+    params = event if "supplier_id" in event or "supplier_name" in event or "query" in event else event.get("input", event)
     if not tool_name:
         return {"statusCode": 400, "body": "Missing tool_name"}
     handler = HANDLERS.get(tool_name)

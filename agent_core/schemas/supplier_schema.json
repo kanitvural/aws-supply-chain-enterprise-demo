@@ -1,7 +1,7 @@
 [
   {
     "name": "get_supplier",
-    "description": "Retrieve supplier details including name, contact information, rating, and status.",
+    "description": "Retrieve supplier details including name, contact information, rating, and status. DO NOT GUESS supplier_id. If the ID is unknown, you MUST provide supplier_name instead.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -11,7 +11,7 @@
         },
         "supplier_name": {
           "type": "string",
-          "description": "The name of the supplier to search for if the ID is unknown."
+          "description": "The exact name of the supplier to search for if the ID is unknown. DO NOT guess the ID."
         }
       },
       "required": []

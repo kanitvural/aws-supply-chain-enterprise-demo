@@ -1,17 +1,17 @@
 [
   {
     "name": "check_quality",
-    "description": "Check quality inspection results for a product or batch including pass/fail status and notes.",
+    "description": "Check quality inspection results for a product or batch including pass/fail status and notes. DO NOT GUESS IDs. If the product_id or batch_id is unknown, use product_name instead.",
     "inputSchema": {
       "type": "object",
       "properties": {
         "product_id": {
           "type": "string",
-          "description": "The product identifier to check quality inspections for."
+          "description": "The product identifier to check quality inspections for. Do not guess."
         },
         "product_name": {
           "type": "string",
-          "description": "The name of the product if the ID is unknown."
+          "description": "The exact name of the product if the ID is unknown."
         },
         "batch_id": {
           "type": "string",
@@ -23,17 +23,17 @@
   },
   {
     "name": "get_compliance",
-    "description": "Retrieve compliance status, certifications, and audit information for a product or supplier.",
+    "description": "Retrieve compliance status, certifications, and audit information for a product or supplier. DO NOT GUESS entity_id. Use entity_name if the ID is unknown.",
     "inputSchema": {
       "type": "object",
       "properties": {
         "entity_id": {
           "type": "string",
-          "description": "The unique identifier of the entity to check compliance for."
+          "description": "The unique identifier of the entity to check compliance for. Do not guess."
         },
         "entity_name": {
           "type": "string",
-          "description": "The name of the entity if the ID is unknown."
+          "description": "The exact name of the entity if the ID is unknown."
         },
         "entity_type": {
           "type": "string",
