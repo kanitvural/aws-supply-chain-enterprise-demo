@@ -140,9 +140,24 @@ def _init_gateway():
         _gateway_client.start()
         _gateway_tools = _gateway_client.list_tools_sync()
         logger.info("Discovered %d Gateway tools", len(_gateway_tools))
-        # Fix tool names for Nova (no hyphens)
+        # Fix tool names for Nova (no hyphens) and 64-character limits
         for t in _gateway_tools:
-            t._agent_tool_name = t.mcp_tool.name.replace("___", "_").replace("-", "_")
+            raw_name = t.mcp_tool.name.replace("___", "_").replace("-", "_")
+            
+            # The Gateway prepends a long CDK prefix like: 
+            # 'ProdAgentCoreStackSupplyChainGatewayinventorytarget5905774F_check_inventory'
+            if "_" in raw_name:
+                parts = raw_name.split("_", 1)
+                # If the first part is a long AWS generated ID, drop it
+                if len(parts[0]) > 25 and parts[0].isalnum():
+                    raw_name = parts[1]
+            
+            # Bedrock limit is 64 characters
+            if len(raw_name) > 64:
+                raw_name = raw_name[-64:]
+                
+            # Strip leading/trailing underscores if any
+            t._agent_tool_name = raw_name.strip("_")
     except Exception as e:
         logger.error("Gateway init failed: %s", e)
         _gateway_tools = []
