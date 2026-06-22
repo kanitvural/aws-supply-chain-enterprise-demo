@@ -102,6 +102,30 @@ def track_shipment(params: dict) -> dict:
         return {"error": "Item not found", "status": 404}
     return item
 
+def get_route(params: dict) -> dict:
+    """Look up a route by route_id or route_name."""
+    route_id = params.get("route_id")
+    route_name = params.get("route_name")
+
+    if not route_id and not route_name:
+        return {"error": "Missing required parameter: either route_id or route_name must be provided", "status": 400}
+
+    try:
+        if route_id:
+            resp = routes_table.get_item(Key={"route_id": route_id})
+            item = resp.get("Item")
+        else:
+            from boto3.dynamodb.conditions import Attr
+            resp = routes_table.scan(FilterExpression=Attr("name").eq(route_name))
+            items = resp.get("Items", [])
+            item = items[0] if items else None
+    except ClientError as exc:
+        logger.error("DynamoDB error getting route: %s", exc)
+        return {"error": "Database operation failed", "status": 500}
+
+    if not item:
+        return {"error": f"Item not found (Search: ID={route_id}, Name={route_name})", "status": 404}
+    return item
 
 # ---------------------------------------------------------------------------
 # Tool routing
@@ -111,6 +135,7 @@ HANDLERS = {
     "calculate_shipping": calculate_shipping,
     "list_shipments": list_shipments,
     "track_shipment": track_shipment,
+    "get_route": get_route,
 }
 
 
@@ -123,7 +148,7 @@ def lambda_handler(event, context):
         tool_name = extended_name.split("___")[1] if "___" in extended_name else extended_name
     except (AttributeError, KeyError, TypeError):
         tool_name = event.get("tool_name")
-    params = event if "destination" in event or "tracking_number" in event or "weight_kg" in event else event.get("input", event)
+    params = event if "destination" in event or "tracking_number" in event or "weight_kg" in event or "route_id" in event or "route_name" in event else event.get("input", event)
     if not tool_name:
         return {"statusCode": 400, "body": "Missing tool_name"}
     handler = HANDLERS.get(tool_name)

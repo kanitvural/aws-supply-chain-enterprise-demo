@@ -26,7 +26,7 @@ Global supply chains are incredibly complex. In a traditional enterprise, data i
 This process involves manually querying **7 different databases/tables** and reading through massive documents, taking **hours or even days** to resolve.
 
 **This AI Assistant acts as an intelligent "Supply Chain Co-Pilot".** 
-By deploying an autonomous **Agentic Workflow**, we connected these 7 DynamoDB tables (via 4 specialized AWS Lambda Action Groups) and the corporate manuals (via OpenSearch Vector Knowledge Base) directly to the AI's brain. 
+By deploying an autonomous **Agentic Workflow**, these 7 DynamoDB tables (via 4 specialized AWS Lambda Action Groups) and the corporate manuals (via OpenSearch Vector Knowledge Base) are connected directly to the AI's brain. 
 
 Now, the manager simply types:
 > *"Did batch BCH-1002 pass inspection? If not, what is the exact corporate procedure for defective parts and who is the supplier?"*
@@ -77,13 +77,14 @@ This project implements a fully managed, scalable, and secure architecture utili
 
 ## 🏗️ Enterprise Architecture & Security
 
-To make this system ready for a Fortune 500 company, we built a highly secure, scalable, and isolated architecture:
+To make this system ready for a Fortune 500 company, a highly secure, scalable, and isolated architecture was built:
 
 * **Private Network (VPC & PrivateLink)**: The AI agents run inside a strictly controlled Virtual Private Cloud (VPC). They use AWS PrivateLink (VPC Interface Endpoints) to communicate with Amazon Bedrock, CloudWatch, and S3. This means **data never travels over the public internet**, shielding it from external threats.
-* **100% Data Privacy & Model Choice**: Because the system is built on Amazon Bedrock, enterprise data is never used to train base foundation models. While we default to Amazon Nova, the architecture natively supports Anthropic's **Claude** family. Thanks to AWS's secure infrastructure, using Claude models does not require sending data out to third-party APIs over the internet; everything executes securely within your private AWS boundary.
+* **100% Data Privacy & Model Choice**: Because the system is built on Amazon Bedrock, enterprise data is never used to train base foundation models. While the default is Amazon Nova, the architecture natively supports Anthropic's **Claude** family. Thanks to AWS's secure infrastructure, using Claude models does not require sending data out to third-party APIs over the internet; everything executes securely within your private AWS boundary.
 * **M2M Authentication (Cognito)**: The chat application uses Amazon Cognito with a Machine-to-Machine (M2M) `client_credentials` flow. Every request between components is verified via JWT tokens with strict `supplychain/read` and `supplychain/write` scopes.
-* **MCP (Model Context Protocol) Gateway**: Instead of giving the AI direct, unchecked access to the databases, we route all AI tool requests through the **AgentCore Gateway**. The Gateway validates the AI's requests against strict JSON schemas before triggering isolated Lambda functions.
-* **Data Protection (Guardrails)**: We implemented Amazon Bedrock Guardrails to prevent data leaks. It automatically blocks inappropriate content, masks PII (like passwords), and anonymizes sensitive corporate data (like internal discount codes). It even strictly blocks mentions of confidential internal projects.
+* **MCP (Model Context Protocol) Gateway**: Instead of giving the AI direct, unchecked access to the databases, all AI tool requests are routed through the **AgentCore Gateway**. The Gateway validates the AI's requests against strict JSON schemas before triggering isolated Lambda functions.
+* **Language-Agnostic (Polyglot) Microservices**: Unlike traditional AI frameworks that lock you into Python ecosystems (relying on libraries like Pydantic or LangChain for validation), the architecture is completely language-agnostic. Because the AgentCore Gateway natively enforces Structured Output using open standard JSON Schemas, your enterprise tool handlers can be written in **Go, Rust, Java, or C++**. The AI system effortlessly integrates with any backend without forcing your engineering teams to adopt Python.
+* **Data Protection (Guardrails)**: Amazon Bedrock Guardrails are implemented to prevent data leaks. It automatically blocks inappropriate content, masks PII (like passwords), and anonymizes sensitive corporate data (like internal discount codes). It even strictly blocks mentions of confidential internal projects.
 * **Agentic Memory**: The system uses AgentCore Memory namespaces to separate user preferences, factual semantic memory, and session summaries, meaning the AI remembers context across multiple sessions.
 * **Infinite Scalability (Serverless)**: Thanks to Amazon Bedrock AgentCore, API Gateway, and AWS Lambda, the entire compute layer is 100% serverless. Whether you have 10 users or 10,000 users asking questions simultaneously, the system scales up instantly without any infrastructure bottlenecks, and scales down to zero when idle.
 * **Serverless & Secure Frontend**: The chat UI is hosted as a static site on Amazon S3 and distributed globally via Amazon CloudFront. This is the most cost-effective and scalable frontend architecture possible—there are no running EC2 web servers to maintain or pay for. Origin Access Control (OAC) ensures the S3 bucket is completely blocked from the public internet and only accessible through the secure CloudFront CDN.
@@ -149,7 +150,7 @@ The project deploys 7 DynamoDB tables that act as the single source of truth for
 
 ## 📚 Knowledge Base & Vector Store (RAG)
 
-While DynamoDB handles structured, real-time metrics, a supply chain is also governed by thousands of pages of unstructured documents. To process these, we built a highly scalable Retrieval-Augmented Generation (RAG) pipeline:
+While DynamoDB handles structured, real-time metrics, a supply chain is also governed by thousands of pages of unstructured documents. To process these, a highly scalable Retrieval-Augmented Generation (RAG) pipeline was built:
 
 ### 1. The Data Lake (Amazon S3)
 * **Corporate Manuals**: PDFs, text files, and guidelines detailing quality audits, return policies, and supplier rules.
@@ -161,7 +162,7 @@ Whenever a document is uploaded to S3, it is automatically chunked and converted
 **Why OpenSearch Serverless?**
 * **Zero Infrastructure Management**: Unlike traditional OpenSearch clusters, Serverless requires no node provisioning, patching, or capacity planning. It auto-scales compute instantly based on search query volume.
 * **Cost-Effective for AI Workloads**: In an AI Assistant, vector search traffic is highly unpredictable (bursty). With Serverless, you only pay for the active compute resources consumed during queries and ingestion, eliminating the high costs of idle clusters.
-* **Native Bedrock Integration**: It serves as a seamless, fully-managed vector store backend for Amazon Bedrock Knowledge Bases, allowing the KB Specialist Agent to search securely without us having to write complex vector-math code.
+* **Native Bedrock Integration**: It serves as a seamless, fully-managed vector store backend for Amazon Bedrock Knowledge Bases, allowing the KB Specialist Agent to search securely without the need to write complex vector-math code.
 
 ---
 

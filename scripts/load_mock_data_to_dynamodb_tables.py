@@ -32,8 +32,8 @@ def load_shipments():
 def load_routes():
     table = dynamodb.Table('sc-routes')
     items = [
-        {"route_id": "RT-EU-01", "name": "Ankara to Ordu", "distance_km": 550, "estimated_hours": 6, "status": "CLEAR"},
-        {"route_id": "RT-AS-EU-01", "name": "Shanghai to Istanbul Sea Route", "distance_km": 18000, "estimated_hours": 850, "status": "WEATHER_WARNING"}
+        {"route_id": "RT-EU-01", "name": "Ankara to Ordu", "origin": "Ankara", "destination": "Ordu", "distance_km": 550, "estimated_hours": 6, "status": "CLEAR", "base_cost": 250},
+        {"route_id": "RT-AS-EU-01", "name": "Shanghai to Istanbul Sea Route", "origin": "Shanghai", "destination": "Istanbul", "distance_km": 18000, "estimated_hours": 850, "status": "WEATHER_WARNING", "base_cost": 1500}
     ]
     with table.batch_writer() as batch:
         for item in items:
@@ -55,8 +55,8 @@ def load_suppliers():
 def load_inspections():
     table = dynamodb.Table('sc-inspections')
     items = [
-        {"batch_id": "BCH-1001", "product_id": "P-001", "inspector": "John Doe", "status": "PASSED", "date": "2026-06-18"},
-        {"batch_id": "BCH-1002", "product_id": "P-002", "inspector": "Jane Smith", "status": "FAILED", "date": "2026-06-19", "reason": "Voltage variation exceeds 2%"}
+        {"batch_id": "BCH-1001", "product_id": "P-001", "product_name": "Lithium-Ion Battery Pack", "inspector": "John Doe", "status": "PASSED", "date": "2026-06-18"},
+        {"batch_id": "BCH-1002", "product_id": "P-002", "product_name": "Electric Motor 50kW", "inspector": "Jane Smith", "status": "FAILED", "date": "2026-06-19", "reason": "Voltage variation exceeds 2%"}
     ]
     with table.batch_writer() as batch:
         for item in items:
@@ -66,8 +66,8 @@ def load_inspections():
 def load_compliance():
     table = dynamodb.Table('sc-compliance')
     items = [
-        {"entity_id": "SUP-001", "entity_type": "SUPPLIER", "iso_9001": "VALID", "environmental_score": 92},
-        {"entity_id": "P-001", "entity_type": "PRODUCT", "rohs_compliant": True, "ce_certified": True}
+        {"entity_id": "SUP-001", "entity_type": "supplier", "name": "Global Tech Batteries", "iso_9001": "VALID", "environmental_score": 92},
+        {"entity_id": "P-001", "entity_type": "product", "name": "Lithium-Ion Battery Pack", "rohs_compliant": True, "ce_certified": True}
     ]
     with table.batch_writer() as batch:
         for item in items:
