@@ -27,7 +27,7 @@ class SupplyChainPipelineStack(Stack):
             self,
             "Pipeline",
             pipeline_name="SupplyChainPipeline",
-            synth=ShellStep(
+            synth=CodeBuildStep(
                 "Synth",
                 input=CodePipelineSource.connection(
                     github_repo,
@@ -39,6 +39,11 @@ class SupplyChainPipelineStack(Stack):
                     "pip install -r requirements.txt",
                     "cdk synth --context @aws-cdk/core:bootstrapQualifier=sc",
                 ],
+                build_environment=codebuild.BuildEnvironment(
+                    build_image=codebuild.LinuxArmBuildImage.AMAZON_LINUX_2023_STANDARD_3_0,
+                    compute_type=codebuild.ComputeType.SMALL,
+                    privileged=True,
+                )
             ),
             # Docker is required for AgentCore Runtime deployment via AgentRuntimeArtifact.from_asset
             docker_enabled_for_synth=True,
