@@ -313,7 +313,7 @@ class AgentCoreStack(Stack):
             }
         )
         kb_runtime.role.add_to_principal_policy(iam.PolicyStatement(
-            actions=["bedrock:InvokeModel", "bedrock:Retrieve"],
+            actions=["bedrock:InvokeModel", "bedrock:InvokeModelWithResponseStream", "bedrock:Retrieve"],
             resources=["*"],
         ))
 
@@ -370,7 +370,8 @@ class AgentCoreStack(Stack):
         )
         orchestrator_runtime.role.add_to_principal_policy(iam.PolicyStatement(
             actions=[
-                "bedrock:InvokeModel", 
+                "bedrock:InvokeModel",
+                "bedrock:InvokeModelWithResponseStream",
                 "bedrock:ApplyGuardrail",
                 "bedrock-agentcore:InvokeAgentRuntime",
                 "bedrock-agentcore:InvokeGateway",
