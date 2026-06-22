@@ -369,7 +369,14 @@ class AgentCoreStack(Stack):
             }
         )
         orchestrator_runtime.role.add_to_principal_policy(iam.PolicyStatement(
-            actions=["bedrock:InvokeModel", "bedrock:ApplyGuardrail"],
+            actions=[
+                "bedrock:InvokeModel", 
+                "bedrock:ApplyGuardrail",
+                "bedrock-agentcore:InvokeAgentRuntime",
+                "bedrock-agentcore:InvokeGateway",
+                "bedrock-agentcore:GetMemory",
+                "bedrock-agentcore:UpdateMemory"
+            ],
             resources=["*"],
         ))
 
@@ -388,6 +395,11 @@ class AgentCoreStack(Stack):
                 "COGNITO_CLIENT_ID": app_client.user_pool_client_id,
                 "COGNITO_USER_POOL_ID": user_pool.user_pool_id,
                 "ORCHESTRATOR_RUNTIME_ARN": orchestrator_runtime.agent_runtime_arn,
+                "GATEWAY_URL": gateway.gateway_url,
+                "MEMORY_ID": memory.memory_id,
+                "GUARDRAIL_ID": guardrail_id,
+                "KB_SPECIALIST_RUNTIME_ARN": kb_runtime.agent_runtime_arn,
+                "VPC_ENABLED": "true",
             },
         )
         # Chat handler needs Cognito describe (to fetch client secret at runtime)

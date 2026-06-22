@@ -5,7 +5,7 @@ def get_cloudfront_url():
     print("🔍 Fetching KVural AI App URL from AWS...")
     client = boto3.client('cloudformation', region_name='eu-central-1')
     try:
-        response = client.describe_stacks(StackName='DeployStage-CloudFrontStack')
+        response = client.describe_stacks(StackName='Prod-CloudFrontStack')
         stacks = response.get('Stacks', [])
         if not stacks:
             print("❌ Stack DeployStage-CloudFrontStack not found. Make sure 'make deploy' has finished successfully.")

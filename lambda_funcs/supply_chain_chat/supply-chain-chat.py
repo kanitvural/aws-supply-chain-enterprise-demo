@@ -122,96 +122,15 @@ def invoke_orchestrator(message: str, session_id: str = "") -> str:
         raise Exception(f"Runtime returned HTTP {exc.code}: {error_body[:200]}")
 
 
-# Cache for runtime details (refreshed every 60s)
-_runtime_cache = {"env": {}, "runtime_id": "", "obs_config": {}, "timestamp": 0}
-
-
-def _get_runtime_details() -> dict:
-    """Dynamically fetch the orchestrator runtime's environment variables and runtime ID.
-
-    Caches for 60 seconds to avoid excessive API calls on /status polling.
-    """
-    import time
-    now = time.time()
-    if now - _runtime_cache["timestamp"] < 60 and _runtime_cache["env"]:
-        return _runtime_cache
-
-    if not ORCHESTRATOR_RUNTIME_ARN:
-        return _runtime_cache
-
-    try:
-        runtime_id = ORCHESTRATOR_RUNTIME_ARN.split("/")[-1]
-        client = boto3.client("bedrock-agentcore-control")
-        resp = client.get_agent_runtime(agentRuntimeId=runtime_id)
-        env = resp.get("environmentVariables", {})
-        obs_config = resp.get("observabilityConfiguration", resp.get("loggingConfiguration", {}))
-        _runtime_cache["env"] = env
-        _runtime_cache["runtime_id"] = runtime_id
-        _runtime_cache["obs_config"] = obs_config or {}
-        _runtime_cache["timestamp"] = now
-        logger.info("Refreshed runtime env vars: %s", list(env.keys()))
-        return _runtime_cache
-    except Exception as e:
-        logger.warning("Failed to fetch runtime details: %s", e)
-        return _runtime_cache
-
-
-def _check_vpc_active(runtime_id: str) -> bool:
-    """Check if the orchestrator runtime is running in VPC mode."""
-    if not runtime_id:
-        return False
-    try:
-        client = boto3.client("bedrock-agentcore-control")
-        resp = client.get_agent_runtime(agentRuntimeId=runtime_id)
-        network = resp.get("networkConfiguration", {})
-        return network.get("networkMode") == "VPC"
-    except Exception:
-        return False
-
-
 def handle_status():
-    """Return feature status flags by querying the orchestrator runtime dynamically."""
+    """Return feature status flags by reading environment variables directly."""
     auth_ok = bool(ORCHESTRATOR_RUNTIME_ARN and COGNITO_DOMAIN and COGNITO_CLIENT_ID and COGNITO_USER_POOL_ID)
 
-    cache = _get_runtime_details()
-    env = cache.get("env", {})
-    runtime_id = cache.get("runtime_id", "")
-
-    memory_id = env.get("MEMORY_ID", "")
-    guardrail_id = env.get("GUARDRAIL_ID", "")
-    kb_specialist_arn = env.get("KB_SPECIALIST_RUNTIME_ARN", "")
-    gateway_url = env.get("GATEWAY_URL", "")
-
-    # Verify resources exist (best-effort)
-    memory_active = False
-    if memory_id:
-        try:
-            client = boto3.client("bedrock-agentcore-control")
-            resp = client.get_memory(memoryId=memory_id)
-            memory_active = resp.get("memory", {}).get("status") == "ACTIVE"
-        except Exception:
-            pass
-
-    guardrail_active = False
-    if guardrail_id:
-        try:
-            bedrock = boto3.client("bedrock")
-            resp = bedrock.get_guardrail(guardrailIdentifier=guardrail_id)
-            guardrail_active = resp.get("status") == "READY"
-        except Exception:
-            pass
-
-    kb_active = False
-    if kb_specialist_arn:
-        try:
-            client = boto3.client("bedrock-agentcore-control")
-            rid = kb_specialist_arn.split("/")[-1]
-            resp = client.get_agent_runtime(agentRuntimeId=rid)
-            kb_active = resp.get("status") == "READY"
-        except Exception:
-            pass
-
-    vpc_active = _check_vpc_active(cache.get("runtime_id", ""))
+    memory_id = os.environ.get("MEMORY_ID", "")
+    guardrail_id = os.environ.get("GUARDRAIL_ID", "")
+    kb_specialist_arn = os.environ.get("KB_SPECIALIST_RUNTIME_ARN", "")
+    gateway_url = os.environ.get("GATEWAY_URL", "")
+    vpc_active = os.environ.get("VPC_ENABLED", "false").lower() == "true"
 
     return {
         "statusCode": 200,
@@ -220,9 +139,9 @@ def handle_status():
             "features": {
                 "auth": {"enabled": auth_ok},
                 "gateway": {"enabled": bool(gateway_url)},
-                "memory": {"enabled": memory_active, "memoryId": memory_id or None},
-                "guardrails": {"enabled": guardrail_active, "guardrailId": guardrail_id or None},
-                "knowledgeBase": {"enabled": kb_active},
+                "memory": {"enabled": bool(memory_id), "memoryId": memory_id or None},
+                "guardrails": {"enabled": bool(guardrail_id), "guardrailId": guardrail_id or None},
+                "knowledgeBase": {"enabled": bool(kb_specialist_arn)},
                 "vpc": {"enabled": vpc_active},
             }
         }),
