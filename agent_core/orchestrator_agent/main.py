@@ -139,6 +139,7 @@ def _init_gateway():
             )
         )
         _gateway_client.start()
+        logger.info("Fetching fresh MCP tools from the AgentCore Gateway...")
         _gateway_tools = _gateway_client.list_tools_sync()
         logger.info("Discovered %d Gateway tools", len(_gateway_tools))
         # Fix tool names for Nova (no hyphens) and 64-character limits

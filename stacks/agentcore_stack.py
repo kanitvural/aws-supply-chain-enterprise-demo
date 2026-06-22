@@ -329,6 +329,7 @@ class AgentCoreStack(Stack):
                 allowed_scopes=["supplychain/read", "supplychain/write"]
             ),
             exception_level=agentcore.GatewayExceptionLevel.DEBUG,
+            description="Forcing schema refresh for get_route",
         )
 
         # Targets mapping to Lambda functions with S3 schemas
