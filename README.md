@@ -281,22 +281,16 @@ Once the deployment finishes and you open the frontend UI, try asking these ques
 **🚚 2. Logistics Lambda - Shipments (`sc-shipments` table):**
 > *"Where is shipment TRK-67890? Is it delayed and what is the reason?"*
 
-**🗺️ 3. Logistics Lambda - Routes (`sc-routes` table):**
-> *"What is the estimated distance and status for the 'Shanghai to Istanbul Sea Route'?"*
-
-**🏭 4. Supplier Lambda (`sc-suppliers` table):**
-> *"Can you give me the contact email, tier, and reliability rating for 'Global Tech Batteries?"*
-
-**🔍 5. Quality Lambda - Inspections (`sc-inspections` table):**
+**🔍 3. Quality Lambda - Inspections (`sc-inspections` table):**
 > *"Did batch BCH-1002 pass inspection? If not, what was the exact reason?"*
 
-**✅ 6. Quality Lambda - Compliance & Standards (`sc-compliance`, `sc-standards` tables):**
+**✅ 4. Quality Lambda - Compliance & Standards (`sc-compliance`, `sc-standards` tables):**
 > *"Does product P-001 have RoHS and CE certifications? Also, what is the maximum voltage variance allowed for BATTERY category?"*
 
-**📚 7. Knowledge Base / RAG (`inventory_procedures.txt` & `quality_control_manual.txt`):**
+**📚 5. Knowledge Base / RAG (`inventory_procedures.txt` & `quality_control_manual.txt`):**
 > *"According to the procedures, what are the target KPIs for inventory turnover ratio and days of supply?"*
 
-**🛡️ 8. AI Security & Guardrails (Content Filtering):**
+**🛡️ 6. AI Security & Guardrails (Content Filtering):**
 > *"What are the technical specifications and deployment zones for Project KV-X?"*
 *(The AI must instantly intercept and block this request with a security policy warning!)*
 
@@ -304,20 +298,23 @@ Once the deployment finishes and you open the frontend UI, try asking these ques
 
 ## 🗑️ Destroying the Infrastructure (Important to avoid billing!)
 
-Because this project uses AWS CDK Pipelines (a self-mutating CI/CD architecture), running `make destroy` locally **will only delete the Pipeline itself, NOT the actual application infrastructure!**
+To completely remove the project and stop all billing, simply run the following command from the root of the project:
 
-To completely remove the project and stop all billing, you **MUST** perform both steps:
+```bash
+make destroy
+```
 
-1. **Delete the Pipeline (Local):**
-   ```bash
-   make destroy
-   ```
+This automated script will:
+1. Delete all `Prod-*` application stacks sequentially.
+2. Empty the S3 Buckets automatically (Pipeline artifacts and CDK Toolkit).
+3. Destroy the CDK Pipeline and Bootstrap stacks.
 
-2. **Delete the Application Stacks (Manual via AWS Console):**
-   > [!WARNING]
-   > If you skip this step, OpenSearch Serverless and NAT Gateway will continue to generate charges!
-   
-   - Log in to the **AWS CloudFormation Console**.
-   - Search for stacks starting with `Prod-` (e.g., `Prod-AgentCoreStack`, `Prod-LambdaStack`, `Prod-DataStack`, `Prod-VpcStack`).
-   - Select them and click **Delete**. 
-   - *(Tip: Delete them in reverse order, starting with AgentCoreStack/LambdaStack, then DataStack, and finally VpcStack to avoid dependency errors).*
+> [!WARNING]
+> **Troubleshooting Deletion Errors:**
+> Sometimes AWS Custom Resources (like AgentCore) or ENIs may get stuck and refuse to delete, causing `make destroy` to fail or hang.
+> 
+> **If `make destroy` fails or gets stuck:**
+> 1. Go to the **AWS CloudFormation Console**.
+> 2. Search for the stuck stack (e.g., `Prod-AgentCoreStack`).
+> 3. Click **Delete** manually.
+> 4. If it fails again, click Delete one more time and check the **Retain Resources** (Force Delete) option for the problematic resources. This will successfully delete the stack.
