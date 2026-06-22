@@ -43,16 +43,6 @@ def handler(event, context):
                         "engine": "faiss",
                         "space_type": "cosinesimil"
                     }
-                },
-                "AMAZON_BEDROCK_METADATA": {
-                    "type": "text",
-                    "index": False
-                },
-                "AMAZON_BEDROCK_TEXT_CHUNK": {
-                    "type": "text"
-                },
-                "id": {
-                    "type": "keyword"
                 }
             }
         }
@@ -90,4 +80,7 @@ def handler(event, context):
                 
             raise Exception(f"Failed to create index: {err}")
             
+    print("Index creation command accepted. Waiting 120 seconds for AOSS propagation...")
+    time.sleep(120)
+    
     return {'PhysicalResourceId': f"{host}/{index_name}"}

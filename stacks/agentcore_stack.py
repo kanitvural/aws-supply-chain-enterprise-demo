@@ -140,6 +140,7 @@ class AgentCoreStack(Stack):
                     "Principal": [
                         kb_role.role_arn,
                         cr_role.role_arn,
+                        f"arn:aws:iam::{self.account}:user/admin"
                     ]
                 }
             ])
@@ -186,7 +187,12 @@ class AgentCoreStack(Stack):
         # Bedrock Knowledge Base & Data Source
         # ------------------------------------------------------------------
         kb_role.add_to_policy(iam.PolicyStatement(
-            actions=["aoss:APIAccessAll"],
+            actions=[
+                "aoss:APIAccessAll",
+                "bedrock:InvokeModel",
+                "s3:GetObject",
+                "s3:ListBucket"
+            ],
             resources=["*"]
         ))
 
