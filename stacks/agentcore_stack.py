@@ -308,7 +308,7 @@ class AgentCoreStack(Stack):
             network_configuration=network_config,
             authorizer_configuration=auth_config,
             environment_variables={
-                "MODEL_ID": "amazon.nova-lite-v1:0",
+                "MODEL_ID": "eu.amazon.nova-lite-v1:0",
                 "KNOWLEDGE_BASE_ID": knowledge_base.attr_knowledge_base_id,
             }
         )
@@ -357,7 +357,7 @@ class AgentCoreStack(Stack):
             network_configuration=network_config,
             authorizer_configuration=auth_config,
             environment_variables={
-                "MODEL_ID": "amazon.nova-pro-v1:0",
+                "MODEL_ID": "eu.amazon.nova-pro-v1:0",
                 "GATEWAY_URL": gateway.gateway_url,
                 "MEMORY_ID": memory.memory_id,
                 "GUARDRAIL_ID": guardrail_id,
@@ -377,7 +377,18 @@ class AgentCoreStack(Stack):
                 "bedrock-agentcore:InvokeGateway",
                 "bedrock-agentcore:GetMemory",
                 "bedrock-agentcore:UpdateMemory",
+                "bedrock-agentcore:DeleteMemory",
+                "bedrock-agentcore:CreateMemory",
                 "bedrock-agentcore:ListEvents",
+                "bedrock-agentcore:GetEvent",
+                "bedrock-agentcore:CreateEvent",
+                "bedrock-agentcore:UpdateEvent",
+                "bedrock-agentcore:DeleteEvent",
+                "bedrock-agentcore:ListSessions",
+                "bedrock-agentcore:GetSession",
+                "bedrock-agentcore:CreateSession",
+                "bedrock-agentcore:UpdateSession",
+                "bedrock-agentcore:DeleteSession",
                 "cognito-idp:DescribeUserPoolClient"
             ],
             resources=["*"],

@@ -265,6 +265,10 @@ python scripts/get_app_url.py
 
 ## 🎯 Test the AI Assistant (Example Prompts)
 
+> [!TIP]
+> **Ready to Use Instantly!**
+> The deployment pipeline automatically populates all 7 DynamoDB tables with rich mock data and synchronizes the OpenSearch Knowledge Base with the latest PDF/Text documents. You do not need to run any manual seeding scripts or click any "Sync" buttons in the AWS Console—the system is 100% ready to use the moment deployment finishes!
+
 Once the deployment finishes and you open the frontend UI, try asking these questions to thoroughly test all 4 Lambda Action Groups, 7 DynamoDB Tables, the RAG system, and the Security Guardrails:
 
 **📦 1. Inventory Lambda (`sc-inventory` table):**
