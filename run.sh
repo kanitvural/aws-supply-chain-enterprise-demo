@@ -27,10 +27,64 @@ deploy() {
 }
 
 destroy() {
-  echo "⚠️ Destroying SupplyChainPipeline (Account: $ACCOUNT_ID, Region: $REGION)"
+  echo "⚠️ Destroying SupplyChainPipeline and all deployed Prod-* Stacks (Account: $ACCOUNT_ID, Region: $REGION)"
+  
+  # List of Prod stacks in REVERSE order of their dependencies
+  STACKS_TO_DELETE=(
+    "Prod-CloudFrontStack"
+    "Prod-ApiGatewayStack"
+    "Prod-AgentCoreStack"
+    "Prod-LambdaStack"
+    "Prod-MlopsEvalStack"
+    "Prod-GuardrailsStack"
+    "Prod-DynamoDbStack"
+    "Prod-S3AssetsStack"
+    "Prod-CognitoStack"
+    "Prod-VpcStack"
+    "Prod-CloudWatchDashboardStack"
+  )
+
+  for stack in "${STACKS_TO_DELETE[@]}"; do
+    echo "🗑️ Deleting stack: $stack..."
+    aws cloudformation delete-stack --stack-name $stack --region $REGION
+  done
+
+  echo "⏳ Waiting for Prod-* stacks to be deleted..."
+  for stack in "${STACKS_TO_DELETE[@]}"; do
+    aws cloudformation wait stack-delete-complete --stack-name $stack --region $REGION 2>/dev/null || true
+    echo "✅ Deleted $stack"
+  done
+
+  echo "⚠️ Destroying the Pipeline stack itself..."
   cdk destroy --all \
     --context @aws-cdk/core:bootstrapQualifier=sc \
     --force
+
+  echo "⚠️ Destroying CDKToolkit-SC (Bootstrap environment)..."
+  
+  # Find the S3 bucket and ECR repo specific to this SC qualifier
+  CDK_BUCKET=$(aws cloudformation describe-stacks --stack-name CDKToolkit-SC --region $REGION --query "Stacks[0].Outputs[?OutputKey=='BucketName'].OutputValue" --output text 2>/dev/null || echo "")
+  CDK_ECR=$(aws cloudformation describe-stack-resource --stack-name CDKToolkit-SC --logical-resource-id ContainerAssetsRepository --region $REGION --query "StackResourceDetail.PhysicalResourceId" --output text 2>/dev/null || echo "")
+
+  if [[ -n "$CDK_BUCKET" && "$CDK_BUCKET" != "None" ]]; then
+    echo "🧹 Emptying CDK Toolkit S3 Bucket: $CDK_BUCKET"
+    # Delete all objects and versions
+    aws s3 rm s3://$CDK_BUCKET --recursive 2>/dev/null || true
+    # Python one-liner to delete all object versions securely
+    python3 -c "import boto3; s3=boto3.resource('s3'); b=s3.Bucket('$CDK_BUCKET'); b.object_versions.delete()" 2>/dev/null || true
+  fi
+
+  if [[ -n "$CDK_ECR" && "$CDK_ECR" != "None" ]]; then
+    echo "🧹 Emptying CDK Toolkit ECR Repository: $CDK_ECR"
+    # Python one-liner to delete all ECR images
+    python3 -c "import boto3; c=boto3.client('ecr', region_name='$REGION'); imgs=c.list_images(repositoryName='$CDK_ECR').get('imageIds',[]); c.batch_delete_image(repositoryName='$CDK_ECR', imageIds=imgs) if imgs else None" 2>/dev/null || true
+  fi
+
+  echo "🗑️ Deleting stack: CDKToolkit-SC..."
+  aws cloudformation delete-stack --stack-name CDKToolkit-SC --region $REGION
+  aws cloudformation wait stack-delete-complete --stack-name CDKToolkit-SC --region $REGION 2>/dev/null || true
+  echo "✅ Deleted CDKToolkit-SC"
+  echo "🎉 Environment is now 100% clean!"
 }
 
 # --- Dispatcher ---

@@ -375,7 +375,8 @@ class AgentCoreStack(Stack):
                 "bedrock-agentcore:InvokeAgentRuntime",
                 "bedrock-agentcore:InvokeGateway",
                 "bedrock-agentcore:GetMemory",
-                "bedrock-agentcore:UpdateMemory"
+                "bedrock-agentcore:UpdateMemory",
+                "cognito-idp:DescribeUserPoolClient"
             ],
             resources=["*"],
         ))
