@@ -6,7 +6,7 @@ and deploys the SupplyChainStage.
 """
 
 from aws_cdk import Stack, aws_iam as iam, aws_codebuild as codebuild
-from aws_cdk.pipelines import CodePipeline, CodePipelineSource, ShellStep, CodeBuildStep
+from aws_cdk.pipelines import CodePipeline, CodePipelineSource, ShellStep, CodeBuildStep, CodeBuildOptions
 from constructs import Construct
 
 from .supply_chain_stage import SupplyChainStage
@@ -39,6 +39,14 @@ class SupplyChainPipelineStack(Stack):
                     "pip install -r requirements.txt",
                     "cdk synth --context @aws-cdk/core:bootstrapQualifier=sc",
                 ],
+                build_environment=codebuild.BuildEnvironment(
+                    build_image=codebuild.LinuxArmBuildImage.AMAZON_LINUX_2023_STANDARD_3_0,
+                    compute_type=codebuild.ComputeType.SMALL,
+                    privileged=True,
+                )
+            ),
+            # Ensure Docker assets are built on ARM64 for Bedrock Agent compatibility
+            asset_publishing_code_build_defaults=CodeBuildOptions(
                 build_environment=codebuild.BuildEnvironment(
                     build_image=codebuild.LinuxArmBuildImage.AMAZON_LINUX_2023_STANDARD_3_0,
                     compute_type=codebuild.ComputeType.SMALL,
