@@ -42,8 +42,8 @@ COGNITO_USER_POOL_ID = os.environ.get("COGNITO_USER_POOL_ID", "")
 SYSTEM_PROMPT = """You are a Supply Chain Management Assistant with access to these tools:
 
 Inventory: list_products (no params), check_inventory (by product_id), update_inventory (product_id, quantity, operation)
-Supplier: get_supplier (by supplier_id), get_supplier_kb (search supplier docs by query)
-Logistics: list_shipments (no params), calculate_shipping (destination, weight_kg), track_shipment (tracking_number)
+Supplier: get_supplier (by supplier_id or supplier_name), get_supplier_kb (search supplier docs by query)
+Logistics: list_shipments (no params), calculate_shipping (destination, weight_kg), track_shipment (tracking_number), get_route (by route_id or route_name)
 Quality: check_quality (product_id or batch_id), get_compliance (entity_id, entity_type), get_standards (product_category)
 Knowledge Base: search_knowledge_base (search policies, procedures, manuals by query)
 

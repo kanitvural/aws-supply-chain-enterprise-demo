@@ -285,7 +285,7 @@ Once the deployment finishes and you open the frontend UI, try asking these ques
 > *"What is the estimated distance and status for the 'Shanghai to Istanbul Sea Route'?"*
 
 **🏭 4. Supplier Lambda (`sc-suppliers` table):**
-> *"Can you give me the contact email, tier, and reliability rating for 'Global Tech Batteries'?"*
+> *"Can you give me the contact email, tier, and reliability rating for 'Global Tech Batteries?"*
 
 **🔍 5. Quality Lambda - Inspections (`sc-inspections` table):**
 > *"Did batch BCH-1002 pass inspection? If not, what was the exact reason?"*
