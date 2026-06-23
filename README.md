@@ -232,7 +232,21 @@ This architecture is primarily **Serverless** (pay-per-use), making it highly co
 
 ## 🚀 Deployment Instructions
 
-Ensure you have your AWS CLI configured with administrator privileges.
+Before deploying this project, ensure your local environment and AWS account meet the following requirements:
+
+### 0. Prerequisites
+
+**Local Environment:**
+* **Node.js (v18+)**: Required for AWS CDK. ([Download Node.js](https://nodejs.org/))
+* **AWS CLI (v2)**: Required to interact with your AWS account. ([Install AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html))
+* **Python (3.11+)**: Required for the CDK deployment scripts and Lambda functions.
+* **Git**: Required for version control and pulling the repository.
+* **AWS CDK**: Install the AWS Cloud Development Kit globally by running `npm install -g aws-cdk` in your terminal.
+
+**AWS Account Setup:**
+* **IAM User/Role**: You must have an IAM User or Role with `AdministratorAccess` (or sufficient permissions to create VPCs, IAM Roles, Lambda functions, Bedrock models, and OpenSearch collections).
+* **AWS CLI Configuration**: Configure your local machine with your AWS credentials by running `aws configure` in your terminal and providing your Access Key ID and Secret Access Key.
+* **Amazon Bedrock Model Access**: You **MUST** manually request access to the Amazon Nova models (Nova Pro and Nova Lite) and Titan Text Embeddings V2 in the AWS Bedrock Console before deploying, otherwise the deployment will fail.
 
 ### 1. Setup Your Own GitHub Repository & Environment
 Since the AWS CodePipeline requires access to the source code, you must push this code to your own GitHub account:
