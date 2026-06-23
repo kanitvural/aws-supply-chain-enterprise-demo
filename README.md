@@ -10,7 +10,7 @@
 [![DynamoDB](https://img.shields.io/badge/Amazon%20DynamoDB-NoSQL-4053D6.svg)](https://aws.amazon.com/dynamodb/)
 [![Vanilla JS](https://img.shields.io/badge/Vanilla%20JS-Frontend-F7DF1E.svg)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 
-![Architecture Diagram](_images/diagram.png)
+![Architecture Diagram](_images/diagram.svg)
 
 This project demonstrates a fully functional, enterprise-grade Supply Chain AI Assistant powered by **Amazon Bedrock AgentCore** and the **Strands Framework**. It uses a self-mutating AWS CDK CodePipeline to deploy the entire infrastructure securely and scalably into your AWS environment.
 
@@ -32,6 +32,22 @@ Now, the manager simply types:
 > *"Did batch BCH-1002 pass inspection? If not, what is the exact corporate procedure for defective parts and who is the supplier?"*
 
 The AI uses **Chain of Thought** reasoning to realize it needs to independently query the Inspections API, then the Supplier API, and finally run a Semantic Search (RAG) over the Knowledge Base. It synthesizes all this data and delivers a perfect, actionable answer in **literally seconds**.
+
+### 🌟 Beyond Efficiency: Solving Core Enterprise IT Challenges
+While operational efficiency is the visible outcome, deploying AI in a corporate environment introduces massive IT hurdles. This architecture is specifically designed to solve the most critical enterprise concerns:
+
+**🛡️ 1. Defense-Grade Data Privacy & Security**
+Enterprise data privacy is non-negotiable. This architecture guarantees that your proprietary company data never leaks to the public internet. The entire AI agent ecosystem runs inside a highly secure, closed-loop **Private Network (VPC)** utilizing AWS PrivateLink. 
+Furthermore, every component (the Orchestrator, the Knowledge Base, and the 4 specialized Tools) operates in strict isolation. The agents can only interact with your databases by acquiring temporary **JWT Tokens via Amazon Cognito**, guaranteeing that no unauthorized actions can ever be performed.
+
+**📈 2. Infinite & Automatic Scalability**
+Traditional enterprise systems crash under sudden traffic spikes. Because this architecture is entirely decoupled and event-driven, it scales horizontally and automatically. Whether you have 10 or 10,000 managers querying the AI simultaneously during a global supply chain crisis, the system absorbs the load effortlessly without manual intervention.
+
+**⚡ 3. Ultra-Low Latency Knowledge Retrieval**
+A Knowledge Base Agent is only as good as its retrieval speed. Querying massive corporate vector databases traditionally results in frustrating bottlenecks. By leveraging **Amazon OpenSearch Serverless**, this architecture guarantees sub-millisecond search latencies. Even when sifting through gigabytes of dense quality control manuals, the AI retrieves the exact semantic vector context in a fraction of a second.
+
+**💰 4. Zero Idle Costs (100% Serverless)**
+Traditional AI infrastructure requires provisioning expensive, always-on servers (EC2/ECS) that drain IT budgets even when no one is using them. This solution is built on a pure **Serverless Architecture**. When your managers are asleep and the system is idle, your compute costs drop to **exactly zero**. You only pay for the exact milliseconds of compute used during an active query, resulting in a massive cost advantage.
 
 ---
 
@@ -55,6 +71,53 @@ This project implements a fully managed, scalable, and secure architecture utili
 
 ---
 
+## 🏗️ Deep Dive: Technical Enterprise Features
+
+Beyond the high-level business advantages, this architecture includes a deep suite of technical features designed specifically for Fortune 500 engineering and security teams:
+
+* **Private Network (VPC & PrivateLink)**: The AI agents run inside a strictly controlled Virtual Private Cloud (VPC). They use AWS PrivateLink (VPC Interface Endpoints) to communicate with Amazon Bedrock, CloudWatch, and S3. This means **data never travels over the public internet**, shielding it from external threats.
+* **100% Data Privacy & Model Choice**: Because the system is built on Amazon Bedrock, enterprise data is never used to train base foundation models. While the default is Amazon Nova, the architecture natively supports Anthropic's **Claude** family. Thanks to AWS's secure infrastructure, using Claude models does not require sending data out to third-party APIs over the internet; everything executes securely within your private AWS boundary.
+* **M2M Authentication (Cognito)**: The chat application uses Amazon Cognito with a Machine-to-Machine (M2M) `client_credentials` flow. Every request between components is verified via JWT tokens with strict `supplychain/read` and `supplychain/write` scopes.
+* **MCP (Model Context Protocol) Gateway**: Instead of giving the AI direct, unchecked access to the databases, all AI tool requests are routed through the **AgentCore Gateway**. The Gateway validates the AI's requests against strict JSON schemas before triggering isolated Lambda functions.
+* **Language-Agnostic (Polyglot) Microservices**: Unlike traditional AI frameworks that lock you into Python ecosystems (relying on libraries like Pydantic or LangChain for validation), the architecture is completely language-agnostic. Because the AgentCore Gateway natively enforces Structured Output using open standard JSON Schemas, your enterprise tool handlers can be written in **Go, Rust, Java, or C++**. The AI system effortlessly integrates with any backend without forcing your engineering teams to adopt Python.
+* **Data Protection (Guardrails)**: Amazon Bedrock Guardrails are implemented to prevent data leaks. It automatically blocks inappropriate content, masks PII (like passwords), and anonymizes sensitive corporate data (like internal discount codes). It even strictly blocks mentions of confidential internal projects.
+* **Agentic Memory**: The system uses AgentCore Memory namespaces to separate user preferences, factual semantic memory, and session summaries, meaning the AI remembers context across multiple sessions.
+  <br>![Agentic Memory](_images/memory.png)
+* **Infinite Scalability (Serverless)**: Thanks to Amazon Bedrock AgentCore, API Gateway, and AWS Lambda, the entire compute layer is 100% serverless. Whether you have 10 users or 10,000 users asking questions simultaneously, the system scales up instantly without any infrastructure bottlenecks, and scales down to zero when idle.
+* **Serverless & Secure Frontend**: The chat UI is hosted as a static site on Amazon S3 and distributed globally via Amazon CloudFront. This is the most cost-effective and scalable frontend architecture possible—there are no running EC2 web servers to maintain or pay for. Origin Access Control (OAC) ensures the S3 bucket is completely blocked from the public internet and only accessible through the secure CloudFront CDN.
+* **Full Observability & Auditability**: Enterprise systems require strict auditing. AgentCore is fully integrated with AWS CloudWatch. Every tool the AI calls, every database response it reads, and its internal "Chain of Thought" reasoning are logged. If the AI makes a decision, administrators can trace exactly *why* and *how* it reached that conclusion.
+  <br>![CloudWatch Dashboard](_images/cloudwatch_dashboard.png)
+  <br>![Agent Trace Observability](_images/observability.png)
+* **LLMOps & Continuous Evaluation**
+  The architecture includes an automated LLMOps pipeline. A weekly EventBridge cron triggers a Lambda function that initiates an **Automated Amazon Bedrock Evaluation Job**. Currently, this evaluates the **Knowledge Base Specialist (Nova Lite)** against the `rag_golden.jsonl` dataset to test its semantic understanding and RAG capabilities (scoring Accuracy and Robustness). 
+  <br>![Bedrock Evaluation Job](_images/evaluation.png)
+> 📝 **NOTE:**
+> **Why not evaluate the Orchestrator?** Automated Bedrock Evaluation tests the foundation model in isolation without executing its tools (Lambda/DynamoDB). Because the Orchestrator relies on executing real-world tools to answer questions, testing it requires a "Custom Evaluation" pipeline (using an LLM-as-a-Judge to evaluate tool invocation traces). This specialized Custom Evaluation mechanism is planned for a future release.
+>
+> For highly regulated industries, this Lambda trigger can be swapped with AWS Step Functions and Amazon Augmented AI (A2I) to implement a strict Human-in-the-Loop (HITL) review process.
+* **Self-Mutating CI/CD Pipeline**: Everything is defined as Infrastructure as Code (AWS CDK). The system automatically tests and deploys itself via CodePipeline on every GitHub commit.
+
+---
+
+## 🧱 Infrastructure as Code (CDK) Stacks
+
+The project consists of 11 CDK stacks deployed sequentially via CodePipeline:
+
+![CodePipeline](_images/pipeline.png)
+1. **VPC Stack**: Private and public subnets, NAT Gateway, and required VPC Endpoints.
+2. **DynamoDB Stack**: 7 tables for Inventory, Shipments, Routes, Suppliers, Inspections, Compliance, and Standards.
+3. **S3 Assets Stack**: S3 Bucket for Open API schemas and Knowledge Base text documents.
+4. **Cognito Stack**: User Pool with M2M client_credentials flow for API Gateway to Agent auth.
+5. **Guardrails Stack**: Amazon Bedrock Guardrail for PII filtering, regex masking, and profanity blocking.
+6. **Lambda Stack**: 5 AWS Lambda functions (1 Chat API handler + 4 Domain handlers for Agent MCP tools).
+7. **API Gateway Stack**: REST API exposing endpoints to the frontend.
+8. **CloudFront Stack**: Secure frontend delivery with Origin Access Control (OAC).
+9. **AgentCore Stack**: OpenSearch Serverless collection, Knowledge Base, Memory, Gateway, and 2 containerized AgentCore Runtimes (Orchestrator and KB Specialist).
+10. **CloudWatch Dashboard Stack**: Custom observability dashboard to track AI token consumption, API latency, and Lambda tool execution metrics.
+11. **MLOps Eval Stack**: S3 Data Lake, EventBridge cron, SNS alerts, and a Lambda function for automated weekly Bedrock Model Evaluation using Golden Datasets.
+
+---
+
 ## 📂 Project Structure Overview
 
 ```text
@@ -75,47 +138,6 @@ This project implements a fully managed, scalable, and secure architecture utili
 
 ---
 
-## 🏗️ Enterprise Architecture & Security
-
-To make this system ready for a Fortune 500 company, a highly secure, scalable, and isolated architecture was built:
-
-* **Private Network (VPC & PrivateLink)**: The AI agents run inside a strictly controlled Virtual Private Cloud (VPC). They use AWS PrivateLink (VPC Interface Endpoints) to communicate with Amazon Bedrock, CloudWatch, and S3. This means **data never travels over the public internet**, shielding it from external threats.
-* **100% Data Privacy & Model Choice**: Because the system is built on Amazon Bedrock, enterprise data is never used to train base foundation models. While the default is Amazon Nova, the architecture natively supports Anthropic's **Claude** family. Thanks to AWS's secure infrastructure, using Claude models does not require sending data out to third-party APIs over the internet; everything executes securely within your private AWS boundary.
-* **M2M Authentication (Cognito)**: The chat application uses Amazon Cognito with a Machine-to-Machine (M2M) `client_credentials` flow. Every request between components is verified via JWT tokens with strict `supplychain/read` and `supplychain/write` scopes.
-* **MCP (Model Context Protocol) Gateway**: Instead of giving the AI direct, unchecked access to the databases, all AI tool requests are routed through the **AgentCore Gateway**. The Gateway validates the AI's requests against strict JSON schemas before triggering isolated Lambda functions.
-* **Language-Agnostic (Polyglot) Microservices**: Unlike traditional AI frameworks that lock you into Python ecosystems (relying on libraries like Pydantic or LangChain for validation), the architecture is completely language-agnostic. Because the AgentCore Gateway natively enforces Structured Output using open standard JSON Schemas, your enterprise tool handlers can be written in **Go, Rust, Java, or C++**. The AI system effortlessly integrates with any backend without forcing your engineering teams to adopt Python.
-* **Data Protection (Guardrails)**: Amazon Bedrock Guardrails are implemented to prevent data leaks. It automatically blocks inappropriate content, masks PII (like passwords), and anonymizes sensitive corporate data (like internal discount codes). It even strictly blocks mentions of confidential internal projects.
-* **Agentic Memory**: The system uses AgentCore Memory namespaces to separate user preferences, factual semantic memory, and session summaries, meaning the AI remembers context across multiple sessions.
-* **Infinite Scalability (Serverless)**: Thanks to Amazon Bedrock AgentCore, API Gateway, and AWS Lambda, the entire compute layer is 100% serverless. Whether you have 10 users or 10,000 users asking questions simultaneously, the system scales up instantly without any infrastructure bottlenecks, and scales down to zero when idle.
-* **Serverless & Secure Frontend**: The chat UI is hosted as a static site on Amazon S3 and distributed globally via Amazon CloudFront. This is the most cost-effective and scalable frontend architecture possible—there are no running EC2 web servers to maintain or pay for. Origin Access Control (OAC) ensures the S3 bucket is completely blocked from the public internet and only accessible through the secure CloudFront CDN.
-* **Full Observability & Auditability**: Enterprise systems require strict auditing. AgentCore is fully integrated with AWS CloudWatch. Every tool the AI calls, every database response it reads, and its internal "Chain of Thought" reasoning are logged. If the AI makes a decision, administrators can trace exactly *why* and *how* it reached that conclusion.
-* **LLMOps & Continuous Evaluation**
-  The architecture includes an automated LLMOps pipeline. A weekly EventBridge cron triggers a Lambda function that initiates an **Automated Amazon Bedrock Evaluation Job**. Currently, this evaluates the **Knowledge Base Specialist (Nova Lite)** against the `rag_golden.jsonl` dataset to test its semantic understanding and RAG capabilities (scoring Accuracy and Robustness). 
-> [!NOTE]
-> **Why not evaluate the Orchestrator?** Automated Bedrock Evaluation tests the foundation model in isolation without executing its tools (Lambda/DynamoDB). Because the Orchestrator relies on executing real-world tools to answer questions, testing it requires a "Custom Evaluation" pipeline (using an LLM-as-a-Judge to evaluate tool invocation traces). This specialized Custom Evaluation mechanism is planned for a future release.
->
-> For highly regulated industries, this Lambda trigger can be swapped with AWS Step Functions and Amazon Augmented AI (A2I) to implement a strict Human-in-the-Loop (HITL) review process.
-* **Self-Mutating CI/CD Pipeline**: Everything is defined as Infrastructure as Code (AWS CDK). The system automatically tests and deploys itself via CodePipeline on every GitHub commit.
-
----
-
-## 🛠️ Architecture Stack
-
-The project consists of 11 CDK stacks deployed sequentially via CodePipeline:
-1. **VPC Stack**: Private and public subnets, NAT Gateway, and required VPC Endpoints.
-2. **DynamoDB Stack**: 7 tables for Inventory, Shipments, Routes, Suppliers, Inspections, Compliance, and Standards.
-3. **S3 Assets Stack**: S3 Bucket for Open API schemas and Knowledge Base text documents.
-4. **Cognito Stack**: User Pool with M2M client_credentials flow for API Gateway to Agent auth.
-5. **Guardrails Stack**: Amazon Bedrock Guardrail for PII filtering, regex masking, and profanity blocking.
-6. **Lambda Stack**: 5 AWS Lambda functions (1 Chat API handler + 4 Domain handlers for Agent MCP tools).
-7. **API Gateway Stack**: REST API exposing endpoints to the frontend.
-8. **CloudFront Stack**: Secure frontend delivery with Origin Access Control (OAC).
-9. **AgentCore Stack**: OpenSearch Serverless collection, Knowledge Base, Memory, Gateway, and 2 containerized AgentCore Runtimes (Orchestrator and KB Specialist).
-10. **CloudWatch Dashboard Stack**: Custom observability dashboard to track AI token consumption, API latency, and Lambda tool execution metrics.
-11. **MLOps Eval Stack**: S3 Data Lake, EventBridge cron, SNS alerts, and a Lambda function for automated weekly Bedrock Model Evaluation using Golden Datasets.
-
----
-
 ## 🧠 Multi-Agent System & Tools
 
 At the core of this assistant is a **Multi-Agent Architecture**, splitting complex workflows between specialized AI models to optimize for both cost and reasoning power.
@@ -131,15 +153,19 @@ When the Orchestrator needs real-world data, it cannot query databases directly.
 * **Supplier Tool** ➡️ `Supplier Lambda` ➡️ Queries `sc-suppliers`
 * **Quality Tool** ➡️ `Quality Lambda` ➡️ Queries `sc-inspections`, `sc-compliance`, and `sc-standards`
 
+* 🛡️ **Security & Strict Isolation:** The AI Agents and the Tools run in completely separate, isolated environments. The Orchestrator Agent has **zero direct access** to your DynamoDB tables. It can only communicate with the isolated Lambda functions through the secure Gateway, strictly enforcing the principle of least privilege.
+
 ### 3. The Knowledge Base Specialist Agent (Amazon Nova Lite)
 When a user asks about corporate policies, contracts, or procedural guidelines (which are not in databases but in PDF/Text documents), the Orchestrator delegates the task to the **KB Specialist Agent**. This agent uses Retrieval-Augmented Generation (RAG) to search the **Amazon OpenSearch Serverless** vector database, which contains synced manuals from S3.
 * **Why Nova Lite?** The Specialist Agent has a single, focused job: read a retrieved chunk of text and summarize it accurately. It doesn't need to do complex tool routing. Nova Lite is exceptionally fast and cost-effective, making it the perfect model for high-speed, straightforward reading and summarization tasks.
 
 ---
 
-## 🗄️ DynamoDB Data Architecture
+## 🗄️ DynamoDB Tables
 
 The project deploys 7 DynamoDB tables that act as the single source of truth for the AI Assistant. In a real-world enterprise, these tables would be continuously updated via streaming data from ERP systems (e.g., SAP), Warehouse Management Systems (WMS), and IoT sensors on shipping containers.
+
+![DynamoDB Tables](_images/dynamodb_tables.png)
 
 1. **`sc-inventory`**: Tracks product stock, warehouse locations, and reorder thresholds.
 2. **`sc-shipments`**: Holds active tracking numbers, estimated time of arrival (ETA), and carrier statuses.
@@ -163,9 +189,11 @@ While DynamoDB handles structured, real-time metrics, a supply chain is also gov
 Whenever a document is uploaded to S3, it is automatically chunked and converted into vector embeddings using the **Amazon Titan Text Embeddings** model. These vectors are stored in an **Amazon OpenSearch Serverless** collection.
 
 **Why OpenSearch Serverless?**
-* **Zero Infrastructure Management**: Unlike traditional OpenSearch clusters, Serverless requires no node provisioning, patching, or capacity planning. It auto-scales compute instantly based on search query volume.
-* **Cost-Effective for AI Workloads**: In an AI Assistant, vector search traffic is highly unpredictable (bursty). With Serverless, you only pay for the active compute resources consumed during queries and ingestion, eliminating the high costs of idle clusters.
-* **Native Bedrock Integration**: It serves as a seamless, fully-managed vector store backend for Amazon Bedrock Knowledge Bases, allowing the KB Specialist Agent to search securely without the need to write complex vector-math code.
+* **Hybrid Search (Vector + Exact Keyword):** Semantic search alone often fails when searching for exact corporate part numbers, SKUs, or acronyms. OpenSearch natively supports **Hybrid Search**, combining vector similarity with traditional keyword matching (BM25) to drastically improve RAG accuracy.
+* **Complex Metadata Filtering at Scale:** While basic vector stores (like S3) support metadata, OpenSearch is a dedicated search engine built to instantly execute complex metadata pre-filtering (e.g., *"Only search documents tagged '2023' AND 'Europe' OR 'Approved'"*) across massive datasets without performance degradation.
+* **Sub-Millisecond Latency (At a Premium):** OpenSearch is designed for enterprise use-cases where search results must be returned in fractions of a second. If ultra-low latency is a strict requirement, this is the gold standard.
+* **Cost-Effective vs. Provisioned Clusters:** While OpenSearch has a high baseline cost (~$350/mo), the *Serverless* variant is still much cheaper than running traditional 24/7 dedicated OpenSearch clusters for unpredictable, bursty AI traffic. You don't pay for extreme over-provisioning.
+* **Native Bedrock Integration**: It serves as a seamless, fully-managed vector store backend for Amazon Bedrock Knowledge Bases.
 
 ---
 
@@ -186,17 +214,18 @@ This architecture is primarily **Serverless** (pay-per-use), making it highly co
 | **Amazon S3** | 1 TB Standard Storage + Moderate GET/PUT request volume. | **~$25.00** |
 | **Amazon DynamoDB** | 5 GB Storage ($0.306/GB) + On-Demand Read/Write (~30k requests = negligible). | **~$1.54** |
 | **AWS Lambda** | 30,000 executions (~60k GB-sec). $0.20/1M requests + $0.0000166667/GB-s | **~$1.01** |
+| **Amazon AgentCore** | Serverless Consumption pricing for 30,000 sessions/mo:<br>• **Runtime Compute:** $21.71 (1vCPU/2GB, 60s session with 70% I/O wait)<br>• **Gateway API:** $1.20 (Search & Tool Invocations)<br>• **Memory:** $45.00 (Storage, Events & Retrieval)<br>• **Evaluations & Guardrails:** $2.25 | **~$70.16** |
 | **Amazon API Gateway** | 30,000 requests via HTTP API ($1.20 per million requests). | **~$0.04** |
 | **Amazon CloudWatch** | Custom Dashboards ($3.00) + ~1 GB Log Ingestion ($0.63/GB). | **~$3.63** |
 | **Amazon CloudFront** | Internal UI hosting. ~10 GB Data Transfer Out ($0.085/GB). | **~$0.85** |
 | **Amazon VPC Network** | 1 NAT Gateway ($37.96) + 7 Interface Endpoints across 2 AZs ($121.61) + Data Processing. | **~$159.93** |
-| **Total Estimated Cost** | | **~$610.00** |
+| **Total Estimated Cost** | | **~$680.16** |
 
-> [!TIP]
-> **Cost Optimization & Alternatives (How to reach ~$104/month - 83% Reduction):**
-> If you are building a Proof of Concept (PoC), or if your use-case allows you to forego sub-millisecond search latency and "Defense-Grade" network isolation, you can drastically reduce the cost down to **~$104/month** (an **83% reduction** from the ~$610 total) by making the following two architectural changes:
+> 💡 **TIP:**
+> **Cost Optimization & Alternatives (How to reach ~$174/month - 74% Reduction):**
+> If you are building a Proof of Concept (PoC), or if your use-case allows you to forego sub-millisecond search latency and "Defense-Grade" network isolation, you can drastically reduce the cost down to **~$174/month** (an **74% reduction** from the ~$680 total) by making the following two architectural changes:
 > 
-> 1. **Ultra-Low Cost Vector Store (Save ~$346/mo - If latency is not critical):** OpenSearch Serverless is expensive because it keeps vector graphs in RAM for sub-millisecond latency. If milisecond-level response times are not a strict requirement for your use-case, you can replace it entirely with **Amazon S3 Vector Search**. For 10 GB of vector data and 30,000 queries, S3 Vectors costs approximately **~$4.00/month**.
+> 1. **Ultra-Low Cost Vector Store (Save ~$346/mo - If latency is not critical):** OpenSearch Serverless is expensive because it keeps vector graphs in RAM for sub-millisecond latency. If millisecond-level response times are not a strict requirement for your use-case, you can replace it entirely with **Amazon S3 Vector Search**. For 10 GB of vector data and 30,000 queries, S3 Vectors costs approximately **~$4.00/month**.
 > 2. **Standard AWS Security Network (Save ~$160/mo - If standard security is sufficient):** The current architecture uses a fully isolated VPC with 7 PrivateLink Endpoints and a NAT Gateway to ensure zero public internet routing. If standard AWS IAM security is sufficient and you can forego premium defense-grade network isolation, you can deploy the agents into the standard AWS network. This eliminates all hourly ENI and NAT Gateway charges.
 
 ---
@@ -259,7 +288,7 @@ Deploy the pipeline stack. Once deployed, the self-mutating CodePipeline will ta
 make deploy
 ```
 
-### 4. Get the Live App URL
+### 5. Get the Live App URL
 Once the deployment is complete, you can easily fetch the live application URL by running:
 ```bash
 python scripts/get_app_url.py
@@ -269,11 +298,13 @@ python scripts/get_app_url.py
 
 ## 🎯 Test the AI Assistant (Example Prompts)
 
-> [!TIP]
+> 💡 **TIP:**
 > **Ready to Use Instantly!**
 > The deployment pipeline automatically populates all 7 DynamoDB tables with rich mock data and synchronizes the OpenSearch Knowledge Base with the latest PDF/Text documents. You do not need to run any manual seeding scripts or click any "Sync" buttons in the AWS Console—the system is 100% ready to use the moment deployment finishes!
 
-Once the deployment finishes and you open the frontend UI, try asking these questions to thoroughly test all 4 Lambda Action Groups, 7 DynamoDB Tables, the RAG system, and the Security Guardrails:
+Once the deployment finishes and you open the frontend UI, try asking these example questions to thoroughly test the various Lambda Action Groups, DynamoDB Tables, the RAG system, and the Security Guardrails:
+
+![App Dashboard](_images/app_dashboard.png)
 
 **📦 1. Inventory Lambda (`sc-inventory` table):**
 > *"What is the current stock level of 'Lithium-Ion Battery Pack' in the Ordu-Hub, and do we need to reorder it?"*
@@ -305,11 +336,11 @@ make destroy
 ```
 
 This automated script will:
-1. Delete all `Prod-*` application stacks sequentially.
+1. Delete all `Prod-*` application stacks.
 2. Empty the S3 Buckets automatically (Pipeline artifacts and CDK Toolkit).
 3. Destroy the CDK Pipeline and Bootstrap stacks.
 
-> [!WARNING]
+> ⚠️ **WARNING:**
 > **Troubleshooting Deletion Errors:**
 > Sometimes AWS Custom Resources (like AgentCore) or ENIs may get stuck and refuse to delete, causing `make destroy` to fail or hang.
 > 
@@ -318,3 +349,5 @@ This automated script will:
 > 2. Search for the stuck stack (e.g., `Prod-AgentCoreStack`).
 > 3. Click **Delete** manually.
 > 4. If it fails again, click Delete one more time and check the **Retain Resources** (Force Delete) option for the problematic resources. This will successfully delete the stack.
+
+
