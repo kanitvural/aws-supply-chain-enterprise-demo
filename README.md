@@ -279,7 +279,7 @@ The pipeline pulls the source code directly from GitHub. You must configure an A
 5. Open `cdk.json` in the root of the project. Inside the `"context"` JSON block, update the following properties to match your setup:
    ```json
    "context": {
-     "githubConnectionArn": "arn:aws:codeconnections:eu-central-1:123456789012:connection/...",
+     "githubConnectionArn": "arn:aws:codeconnections:<REGION>:<ACCOUNT_ID>:connection/<CONNECTION_ID>,",
      "githubRepo": "<your-username>/<your-repo-name>",
      "githubBranch": "main"
    }

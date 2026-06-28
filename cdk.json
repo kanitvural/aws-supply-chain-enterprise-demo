@@ -17,11 +17,11 @@
   "context": {
     "@aws-cdk/core:bootstrapQualifier": "sc",
     "@aws-cdk/aws-lambda:recognizeLayerVersion": true,
-    "githubConnectionArn": "arn:aws:codeconnections:eu-central-1:757884822287:connection/6ac6d892-fc1e-4108-9396-3d6ed79b000d",
-    "githubRepo": "kanitvural/aws-supply-chain-enterprise-demo",
+    "githubConnectionArn": "arn:aws:codeconnections:<REGION>:<ACCOUNT_ID>:connection/<CONNECTION_ID>",
+    "githubRepo": "<YOUR_USERNAME>/aws-supply-chain-enterprise-demo",
     "githubBranch": "main",
     "project_name": "supply-chain",
-    "notification_email": "kanitvural@hotmail.com",
+    "notification_email": "<YOUR_EMAIL>",
     "@aws-cdk/core:checkSecretUsage": true,
     "@aws-cdk/core:target-partitions": [
       "aws",
